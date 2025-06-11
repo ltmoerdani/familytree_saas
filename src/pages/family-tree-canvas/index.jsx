@@ -1,35 +1,27 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Stage, Layer, Rect, Text, Circle, Line, Group } from 'react-konva';
+import React, { useState, useRef, useCallback } from 'react';
+import { Stage, Layer, Text, Line } from 'react-konva';
 import Header from 'components/ui/Header';
 import TreeContextIndicator from 'components/ui/TreeContextIndicator';
 import CanvasActionToolbar from 'components/ui/CanvasActionToolbar';
+import GenealogyConnections from 'components/ui/GenealogyConnections';
+import FamilyMemberCard from 'components/ui/FamilyMemberCard';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
+import { useGenealogyTree } from 'hooks/useGenealogyTree';
+import { useDragAndDrop } from 'hooks/useDragAndDrop';
+import { LAYOUT_CONFIG } from 'utils/genealogyLayout';
 
 const FamilyTreeCanvas = () => {
   const stageRef = useRef();
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
-  const [selectedMember, setSelectedMember] = useState(null);
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [draggedMember, setDraggedMember] = useState(null);
 
-  // Mock active tree data
-  const activeTree = {
-    id: 'tree-1',
-    name: 'The Johnson Family Tree',
-    createdAt: '2024-01-15',
-    lastModified: '2024-01-20'
-  };
-
-  // Mock family members data with fixed Y positions for generations
-  const [familyMembers, setFamilyMembers] = useState([
+  // Initialize with mock data
+  const initialMembers = [
     {
       id: 'member-1',
       firstName: 'Robert',
@@ -40,6 +32,7 @@ const FamilyTreeCanvas = () => {
       generation: 1,
       x: 400,
       y: 50,
+      gender: 'male',
       spouseId: 'member-2',
       children: ['member-3', 'member-4']
     },
@@ -53,6 +46,7 @@ const FamilyTreeCanvas = () => {
       generation: 1,
       x: 600,
       y: 50,
+      gender: 'female',
       spouseId: 'member-1',
       children: ['member-3', 'member-4']
     },
@@ -66,6 +60,7 @@ const FamilyTreeCanvas = () => {
       generation: 2,
       x: 300,
       y: 250,
+      gender: 'male',
       spouseId: 'member-5',
       children: ['member-6', 'member-7'],
       parents: ['member-1', 'member-2']
@@ -80,6 +75,7 @@ const FamilyTreeCanvas = () => {
       generation: 2,
       x: 700,
       y: 250,
+      gender: 'female',
       spouseId: 'member-8',
       children: ['member-9'],
       parents: ['member-1', 'member-2']
@@ -94,6 +90,7 @@ const FamilyTreeCanvas = () => {
       generation: 2,
       x: 500,
       y: 250,
+      gender: 'female',
       spouseId: 'member-3',
       children: ['member-6', 'member-7']
     },
@@ -107,6 +104,7 @@ const FamilyTreeCanvas = () => {
       generation: 3,
       x: 200,
       y: 450,
+      gender: 'male',
       parents: ['member-3', 'member-5']
     },
     {
@@ -119,6 +117,7 @@ const FamilyTreeCanvas = () => {
       generation: 3,
       x: 400,
       y: 450,
+      gender: 'female',
       parents: ['member-3', 'member-5']
     },
     {
@@ -131,6 +130,7 @@ const FamilyTreeCanvas = () => {
       generation: 2,
       x: 900,
       y: 250,
+      gender: 'male',
       spouseId: 'member-4',
       children: ['member-9']
     },
@@ -144,22 +144,53 @@ const FamilyTreeCanvas = () => {
       generation: 3,
       x: 800,
       y: 450,
+      gender: 'female',
       parents: ['member-4', 'member-8']
     }
-  ]);
-
-  // Generation levels with fixed Y positions
-  const generationLevels = [
-    { level: 1, y: 50, label: 'Great Grandparents' },
-    { level: 2, y: 250, label: 'Grandparents' },
-    { level: 3, y: 450, label: 'Parents' },
-    { level: 4, y: 650, label: 'Children' }
   ];
 
+  // Use genealogy tree hook
+  const {
+    familyMembers,
+    selectedMember,
+    hasUnsavedChanges,
+    generations,
+    setSelectedMember,
+    updateMemberPosition,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    searchMembers,
+    markAsSaved
+  } = useGenealogyTree(initialMembers);
+
+  // Use drag and drop hook
+  const {
+    handleDragStart,
+    handleDragEnd,
+    isDragging
+  } = useDragAndDrop((member, newPosition) => {
+    updateMemberPosition(member.id, newPosition.x, newPosition.y);
+  });
+
+  // Mock active tree data
+  const activeTree = {
+    id: 'tree-1',
+    name: 'The Johnson Family Tree',
+    createdAt: '2024-01-15',
+    lastModified: '2024-01-20'
+  };
+
+  // Generation levels dengan posisi Y yang diperbaiki
+  const generationLevels = Object.keys(generations).map(gen => ({
+    level: parseInt(gen),
+    y: 50 + ((parseInt(gen) - 1) * LAYOUT_CONFIG.GENERATION_GAP),
+    label: `Generation ${gen}`
+  })).sort((a, b) => a.level - b.level);
+
   // Filter members based on search
-  const filteredMembers = familyMembers.filter(member =>
-    `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMembers = searchMembers(searchQuery);
 
   // Canvas controls
   const handleZoomIn = useCallback(() => {
@@ -180,47 +211,31 @@ const FamilyTreeCanvas = () => {
   const handleSave = useCallback(async () => {
     // Mock save functionality
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setHasUnsavedChanges(false);
-  }, []);
+    markAsSaved();
+  }, [markAsSaved]);
 
   const handleUndo = useCallback(() => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      // Restore previous state
-    }
-  }, [historyIndex]);
+    undo();
+  }, [undo]);
 
   const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      // Restore next state
-    }
-  }, [historyIndex, history]);
-
-  // Member card drag handling
-  const handleMemberDragStart = (member) => {
-    setDraggedMember(member);
-  };
-
-  const handleMemberDragEnd = (e, member) => {
-    const newX = e.target.x();
-    const generationY = generationLevels.find(g => g.level === member.generation)?.y || member.y;
-    
-    setFamilyMembers(prev => prev.map(m => 
-      m.id === member.id 
-        ? { ...m, x: newX, y: generationY }
-        : m
-    ));
-    
-    setDraggedMember(null);
-    setHasUnsavedChanges(true);
-  };
+    redo();
+  }, [redo]);
 
   // Member selection
-  const handleMemberSelect = (member) => {
+  const handleMemberSelect = useCallback((member) => {
     setSelectedMember(member);
     setIsRightPanelOpen(true);
-  };
+  }, [setSelectedMember]);
+
+  // Updated drag handlers to use the new hook
+  const handleMemberDragStart = useCallback((member) => {
+    handleDragStart(member);
+  }, [handleDragStart]);
+
+  const handleMemberDragEnd = useCallback((e, member) => {
+    handleDragEnd(e);
+  }, [handleDragEnd]);
 
   // Export functionality
   const handleExport = (format) => {
@@ -238,137 +253,6 @@ const FamilyTreeCanvas = () => {
       link.click();
     }
     setIsExportModalOpen(false);
-  };
-
-  // Render family member card on canvas
-  const FamilyMemberCard = ({ member }) => {
-    const isSelected = selectedMember?.id === member.id;
-    const isDragging = draggedMember?.id === member.id;
-    
-    return (
-      <Group
-        x={member.x}
-        y={member.y}
-        draggable
-        onDragStart={() => handleMemberDragStart(member)}
-        onDragEnd={(e) => handleMemberDragEnd(e, member)}
-        onClick={() => handleMemberSelect(member)}
-        opacity={isDragging ? 0.7 : 1}
-        scaleX={isDragging ? 1.05 : 1}
-        scaleY={isDragging ? 1.05 : 1}
-      >
-        {/* Card background */}
-        <Rect
-          width={120}
-          height={140}
-          fill="white"
-          stroke={isSelected ? "#8B4513" : "#E5E7EB"}
-          strokeWidth={isSelected ? 2 : 1}
-          cornerRadius={8}
-          shadowColor="rgba(0,0,0,0.1)"
-          shadowBlur={4}
-          shadowOffset={{ x: 0, y: 2 }}
-        />
-        
-        {/* Photo placeholder */}
-        <Circle
-          x={60}
-          y={30}
-          radius={20}
-          fill="#D2B48C"
-          stroke="#8B4513"
-          strokeWidth={1}
-        />
-        
-        {/* Name */}
-        <Text
-          x={10}
-          y={60}
-          width={100}
-          text={`${member.firstName} ${member.lastName}`}
-          fontSize={12}
-          fontFamily="Inter"
-          fill="#2C1810"
-          align="center"
-          wrap="word"
-        />
-        
-        {/* Birth date */}
-        <Text
-          x={10}
-          y={85}
-          width={100}
-          text={`Born: ${new Date(member.birthDate).getFullYear()}`}
-          fontSize={10}
-          fontFamily="Inter"
-          fill="#6B4E3D"
-          align="center"
-        />
-        
-        {/* Death date */}
-        {member.deathDate && (
-          <Text
-            x={10}
-            y={100}
-            width={100}
-            text={`Died: ${new Date(member.deathDate).getFullYear()}`}
-            fontSize={10}
-            fontFamily="Inter"
-            fill="#6B4E3D"
-            align="center"
-          />
-        )}
-      </Group>
-    );
-  };
-
-  // Render connection lines
-  const ConnectionLines = () => {
-    const lines = [];
-    
-    familyMembers.forEach(member => {
-      // Marriage lines (horizontal)
-      if (member.spouseId) {
-        const spouse = familyMembers.find(m => m.id === member.spouseId);
-        if (spouse && member.id < spouse.id) { // Avoid duplicate lines
-          lines.push(
-            <Line
-              key={`marriage-${member.id}-${spouse.id}`}
-              points={[
-                member.x + 60, member.y + 70,
-                spouse.x + 60, spouse.y + 70
-              ]}
-              stroke="#8B4513"
-              strokeWidth={2}
-            />
-          );
-        }
-      }
-      
-      // Parent-child lines (vertical)
-      if (member.children) {
-        member.children.forEach(childId => {
-          const child = familyMembers.find(m => m.id === childId);
-          if (child) {
-            lines.push(
-              <Line
-                key={`parent-child-${member.id}-${childId}`}
-                points={[
-                  member.x + 60, member.y + 140,
-                  member.x + 60, member.y + 180,
-                  child.x + 60, child.y - 40,
-                  child.x + 60, child.y
-                ]}
-                stroke="#8B4513"
-                strokeWidth={1.5}
-              />
-            );
-          }
-        });
-      }
-    });
-    
-    return lines;
   };
 
   return (
@@ -507,12 +391,20 @@ const FamilyTreeCanvas = () => {
                 </React.Fragment>
               ))}
               
-              {/* Connection lines */}
-              <ConnectionLines />
+              {/* Genealogy connection lines */}
+              <GenealogyConnections familyMembers={familyMembers} />
               
               {/* Family member cards */}
               {familyMembers.map(member => (
-                <FamilyMemberCard key={member.id} member={member} />
+                <FamilyMemberCard 
+                  key={member.id} 
+                  member={member}
+                  isSelected={selectedMember?.id === member.id}
+                  isDragging={isDragging(member)}
+                  onSelect={handleMemberSelect}
+                  onDragStart={handleMemberDragStart}
+                  onDragEnd={handleMemberDragEnd}
+                />
               ))}
             </Layer>
           </Stage>
@@ -556,8 +448,9 @@ const FamilyTreeCanvas = () => {
                 {/* Basic Info */}
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">First Name</label>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-1">First Name</label>
                     <input
+                      id="firstName"
                       type="text"
                       value={selectedMember.firstName}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
@@ -565,8 +458,9 @@ const FamilyTreeCanvas = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">Last Name</label>
+                    <label htmlFor="lastName" className="block text-sm font-medium text-text-primary mb-1">Last Name</label>
                     <input
+                      id="lastName"
                       type="text"
                       value={selectedMember.lastName}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
@@ -574,8 +468,9 @@ const FamilyTreeCanvas = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">Birth Date</label>
+                    <label htmlFor="birthDate" className="block text-sm font-medium text-text-primary mb-1">Birth Date</label>
                     <input
+                      id="birthDate"
                       type="date"
                       value={selectedMember.birthDate}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
@@ -583,8 +478,9 @@ const FamilyTreeCanvas = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-1">Death Date</label>
+                    <label htmlFor="deathDate" className="block text-sm font-medium text-text-primary mb-1">Death Date</label>
                     <input
+                      id="deathDate"
                       type="date"
                       value={selectedMember.deathDate || ''}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
@@ -646,8 +542,8 @@ const FamilyTreeCanvas = () => {
         onSave={handleSave}
         onUndo={handleUndo}
         onRedo={handleRedo}
-        canUndo={historyIndex > 0}
-        canRedo={historyIndex < history.length - 1}
+        canUndo={canUndo}
+        canRedo={canRedo}
         zoomLevel={Math.round(stageScale * 100)}
         hasUnsavedChanges={hasUnsavedChanges}
       />

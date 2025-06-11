@@ -10,6 +10,7 @@ import FamilyTreeCanvas from "pages/family-tree-canvas";
 import MemberProfile from "pages/member-profile";
 import ImportData from "pages/import-data";
 import ExportShare from "pages/export-share";
+import GenealogyTreeDemo from "components/ui/GenealogyTreeDemo";
 
 const Routes = () => {
   return (
@@ -23,6 +24,7 @@ const Routes = () => {
           <Route path="/member-profile" element={<MemberProfile />} />
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/export-share" element={<ExportShare />} />
+          <Route path="/demo" element={<GenealogyTreeDemo />} />
           <Route path="/" element={<LoginRegister />} />
         </RouterRoutes>
       </ErrorBoundary>
