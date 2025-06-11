@@ -12,10 +12,27 @@ const CanvasActionToolbar = ({
   canUndo = false,
   canRedo = false,
   zoomLevel = 100,
-  hasUnsavedChanges = false 
+  hasUnsavedChanges = false,
+  onAutoLayout,
+  onHierarchicalLayout,
+  layoutMode = 'manual'
 }) => {
   const location = useLocation();
   const [isSaving, setIsSaving] = useState(false);
+
+  // Helper functions
+  const getButtonClassName = (item, isSaving) => {
+    const baseClasses = 'p-2 rounded transition-smooth';
+    if (item.variant === 'primary') {
+      return `${baseClasses} text-white bg-primary hover:bg-primary-600 disabled:bg-primary-300`;
+    }
+    return `${baseClasses} text-text-secondary hover:text-primary hover:bg-surface disabled:text-text-secondary/50 disabled:cursor-not-allowed`;
+  };
+
+  const getButtonTitle = (item) => {
+    const shortcutText = item.shortcut ? ` (${item.shortcut})` : '';
+    return `${item.label}${shortcutText}`;
+  };
 
   // Show only on family tree canvas
   if (location.pathname !== '/family-tree-canvas') {
@@ -82,6 +99,26 @@ const CanvasActionToolbar = ({
       type: 'divider'
     },
     {
+      id: 'auto-layout',
+      icon: 'GitBranch',
+      label: 'Auto Layout',
+      onClick: onAutoLayout,
+      shortcut: 'Ctrl+L',
+      variant: layoutMode === 'auto' ? 'primary' : 'default'
+    },
+    {
+      id: 'hierarchical-layout',
+      icon: 'TreePine',
+      label: 'Hierarchical Layout',
+      onClick: onHierarchicalLayout,
+      shortcut: 'Ctrl+H',
+      variant: layoutMode === 'hierarchical' ? 'primary' : 'default'
+    },
+    {
+      id: 'divider3',
+      type: 'divider'
+    },
+    {
       id: 'save',
       icon: isSaving ? 'Loader2' : 'Save',
       label: isSaving ? 'Saving...' : 'Save',
@@ -122,10 +159,8 @@ const CanvasActionToolbar = ({
                 key={item.id}
                 onClick={item.onClick}
                 disabled={item.disabled}
-                className={`p-2 rounded transition-smooth ${
-                  item.variant === 'primary' ?'text-white bg-primary hover:bg-primary-600 disabled:bg-primary-300' :'text-text-secondary hover:text-primary hover:bg-surface disabled:text-text-secondary/50 disabled:cursor-not-allowed'
-                }`}
-                title={`${item.label}${item.shortcut ? ` (${item.shortcut})` : ''}`}
+                className={getButtonClassName(item, isSaving)}
+                title={getButtonTitle(item)}
               >
                 <Icon 
                   name={item.icon} 

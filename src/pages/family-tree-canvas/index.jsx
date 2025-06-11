@@ -1,24 +1,25 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Stage, Layer, Text, Line } from 'react-konva';
 import Header from 'components/ui/Header';
 import TreeContextIndicator from 'components/ui/TreeContextIndicator';
 import CanvasActionToolbar from 'components/ui/CanvasActionToolbar';
 import GenealogyConnections from 'components/ui/GenealogyConnections';
 import FamilyMemberCard from 'components/ui/FamilyMemberCard';
+import Minimap from 'components/ui/Minimap';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
 import { useGenealogyTree } from 'hooks/useGenealogyTree';
 import { useDragAndDrop } from 'hooks/useDragAndDrop';
-import { LAYOUT_CONFIG } from 'utils/genealogyLayout';
+import { useCanvasControls } from 'hooks/useCanvasControls';
+import { calculateAutoLayout, calculateHierarchicalLayout, getLayoutBounds, centerLayout } from 'utils/autoLayout';
 
 const FamilyTreeCanvas = () => {
-  const stageRef = useRef();
-  const [stageScale, setStageScale] = useState(1);
-  const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [layoutMode, setLayoutMode] = useState('manual'); // 'auto', 'hierarchical', 'manual'
+  const [showMinimap, setShowMinimap] = useState(true);
 
   // Initialize with mock data
   const initialMembers = [
@@ -157,6 +158,7 @@ const FamilyTreeCanvas = () => {
     generations,
     setSelectedMember,
     updateMemberPosition,
+    updateAllMembers,
     undo,
     redo,
     canUndo,
@@ -165,7 +167,27 @@ const FamilyTreeCanvas = () => {
     markAsSaved
   } = useGenealogyTree(initialMembers);
 
-  // Use drag and drop hook
+  // Enhanced canvas controls with zoom, pan, and minimap
+  const {
+    scale,
+    position,
+    stageRef,
+    stageSize,
+    zoomIn,
+    zoomOut,
+    zoomToFit,
+    resetZoom,
+    handleWheel,
+    handleDragStart: handleStageDragStart,
+    handleDragEnd: handleStageDragEnd,
+    updateStageSize,
+    updateContentBounds,
+    getMinimapData,
+    handleMinimapClick,
+    zoomPercentage
+  } = useCanvasControls(1, { x: 0, y: 0 });
+
+  // Enhanced drag and drop hook
   const {
     handleDragStart,
     handleDragEnd,
@@ -173,6 +195,42 @@ const FamilyTreeCanvas = () => {
   } = useDragAndDrop((member, newPosition) => {
     updateMemberPosition(member.id, newPosition.x, newPosition.y);
   });
+
+  // Update canvas size on resize
+  useEffect(() => {
+    const handleResize = () => {
+      const leftPanelWidth = isLeftPanelOpen ? 320 : 0;
+      const rightPanelWidth = isRightPanelOpen ? 320 : 0;
+      const width = window.innerWidth - leftPanelWidth - rightPanelWidth;
+      const height = window.innerHeight - 112;
+      updateStageSize(width, height);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isLeftPanelOpen, isRightPanelOpen, updateStageSize]);
+
+  // Update content bounds when family members change
+  useEffect(() => {
+    const bounds = getLayoutBounds(familyMembers);
+    updateContentBounds(bounds);
+  }, [familyMembers, updateContentBounds]);
+
+  // Auto-layout functions
+  const applyAutoLayout = useCallback(() => {
+    const layoutMembers = calculateAutoLayout(familyMembers);
+    const centeredMembers = centerLayout(layoutMembers, stageSize.width, stageSize.height);
+    updateAllMembers(centeredMembers);
+    setLayoutMode('auto');
+  }, [familyMembers, stageSize, updateAllMembers]);
+
+  const applyHierarchicalLayout = useCallback(() => {
+    const layoutMembers = calculateHierarchicalLayout(familyMembers);
+    const centeredMembers = centerLayout(layoutMembers, stageSize.width, stageSize.height);
+    updateAllMembers(centeredMembers);
+    setLayoutMode('hierarchical');
+  }, [familyMembers, stageSize, updateAllMembers]);
 
   // Mock active tree data
   const activeTree = {
@@ -182,10 +240,10 @@ const FamilyTreeCanvas = () => {
     lastModified: '2024-01-20'
   };
 
-  // Generation levels dengan posisi Y yang diperbaiki
+  // Generation levels with improved positioning
   const generationLevels = Object.keys(generations).map(gen => ({
     level: parseInt(gen),
-    y: 50 + ((parseInt(gen) - 1) * LAYOUT_CONFIG.GENERATION_GAP),
+    y: 50 + ((parseInt(gen) - 1) * 200),
     label: `Generation ${gen}`
   })).sort((a, b) => a.level - b.level);
 
@@ -193,21 +251,6 @@ const FamilyTreeCanvas = () => {
   const filteredMembers = searchMembers(searchQuery);
 
   // Canvas controls
-  const handleZoomIn = useCallback(() => {
-    const newScale = Math.min(stageScale * 1.2, 2);
-    setStageScale(newScale);
-  }, [stageScale]);
-
-  const handleZoomOut = useCallback(() => {
-    const newScale = Math.max(stageScale / 1.2, 0.25);
-    setStageScale(newScale);
-  }, [stageScale]);
-
-  const handleZoomReset = useCallback(() => {
-    setStageScale(1);
-    setStagePosition({ x: 0, y: 0 });
-  }, []);
-
   const handleSave = useCallback(async () => {
     // Mock save functionality
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -228,9 +271,9 @@ const FamilyTreeCanvas = () => {
     setIsRightPanelOpen(true);
   }, [setSelectedMember]);
 
-  // Updated drag handlers to use the new hook
-  const handleMemberDragStart = useCallback((member) => {
-    handleDragStart(member);
+  // Updated drag handlers to use the enhanced hook
+  const handleMemberDragStart = useCallback((member, event) => {
+    handleDragStart(member, event);
   }, [handleDragStart]);
 
   const handleMemberDragEnd = useCallback((e, member) => {
@@ -254,6 +297,9 @@ const FamilyTreeCanvas = () => {
     }
     setIsExportModalOpen(false);
   };
+
+  // Get minimap data
+  const minimapData = showMinimap ? getMinimapData() : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -341,34 +387,133 @@ const FamilyTreeCanvas = () => {
         {/* Main Canvas Area */}
         <div className="flex-1 relative overflow-hidden">
           {/* Canvas Controls */}
-          <div className="absolute top-4 left-4 z-40 flex space-x-2">
-            <button
-              onClick={() => setIsLeftPanelOpen(true)}
-              className="md:hidden w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth"
-            >
-              <Icon name="Menu" size={20} />
-            </button>
+          <div className="absolute top-4 left-4 z-40 flex flex-col space-y-2">
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setIsLeftPanelOpen(true)}
+                className="md:hidden w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth"
+              >
+                <Icon name="Menu" size={20} />
+              </button>
+              
+              <button
+                onClick={() => setIsExportModalOpen(true)}
+                className="w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth"
+                title="Export Tree"
+              >
+                <Icon name="Download" size={20} />
+              </button>
+            </div>
             
-            <button
-              onClick={() => setIsExportModalOpen(true)}
-              className="w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth"
-              title="Export Tree"
-            >
-              <Icon name="Download" size={20} />
-            </button>
+            {/* Layout Controls */}
+            <div className="bg-background border border-border rounded-lg p-2">
+              <div className="text-xs font-medium text-text-primary mb-2">Layout</div>
+              <div className="flex flex-col space-y-1">
+                <button
+                  onClick={applyAutoLayout}
+                  className={`px-2 py-1 text-xs rounded ${
+                    layoutMode === 'auto' 
+                      ? 'bg-primary text-white' 
+                      : 'bg-surface text-text-secondary hover:bg-secondary'
+                  }`}
+                >
+                  Auto
+                </button>
+                <button
+                  onClick={applyHierarchicalLayout}
+                  className={`px-2 py-1 text-xs rounded ${
+                    layoutMode === 'hierarchical' 
+                      ? 'bg-primary text-white' 
+                      : 'bg-surface text-text-secondary hover:bg-secondary'
+                  }`}
+                >
+                  Hierarchical
+                </button>
+                <button
+                  onClick={() => setLayoutMode('manual')}
+                  className={`px-2 py-1 text-xs rounded ${
+                    layoutMode === 'manual' 
+                      ? 'bg-primary text-white' 
+                      : 'bg-surface text-text-secondary hover:bg-secondary'
+                  }`}
+                >
+                  Manual
+                </button>
+              </div>
+            </div>
+
+            {/* Zoom Controls */}
+            <div className="bg-background border border-border rounded-lg p-2">
+              <div className="text-xs font-medium text-text-primary mb-2">Zoom</div>
+              <div className="flex flex-col space-y-1">
+                <button
+                  onClick={zoomIn}
+                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
+                  title="Zoom In"
+                >
+                  <Icon name="Plus" size={14} />
+                </button>
+                <div className="text-xs text-center text-text-secondary py-1">
+                  {zoomPercentage}%
+                </div>
+                <button
+                  onClick={zoomOut}
+                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
+                  title="Zoom Out"
+                >
+                  <Icon name="Minus" size={14} />
+                </button>
+                <button
+                  onClick={zoomToFit}
+                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
+                  title="Fit to Screen"
+                >
+                  <Icon name="Maximize2" size={12} />
+                </button>
+                <button
+                  onClick={resetZoom}
+                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
+                  title="Reset Zoom"
+                >
+                  <Icon name="RotateCcw" size={12} />
+                </button>
+              </div>
+            </div>
           </div>
+
+          {/* Minimap */}
+          {showMinimap && (
+            <Minimap
+              familyMembers={familyMembers}
+              minimapData={minimapData}
+              onMinimapClick={handleMinimapClick}
+              className="top-4 right-4"
+            />
+          )}
+
+          {/* Minimap Toggle */}
+          <button
+            onClick={() => setShowMinimap(!showMinimap)}
+            className="absolute top-4 right-4 w-8 h-8 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth z-30"
+            title={showMinimap ? "Hide Minimap" : "Show Minimap"}
+            style={{ right: showMinimap ? '220px' : '16px' }}
+          >
+            <Icon name={showMinimap ? "EyeOff" : "Eye"} size={16} />
+          </button>
           
           {/* Konva Stage */}
           <Stage
             ref={stageRef}
-            width={window.innerWidth - (isLeftPanelOpen ? 320 : 0) - (isRightPanelOpen ? 320 : 0)}
-            height={window.innerHeight - 112}
-            scaleX={stageScale}
-            scaleY={stageScale}
-            x={stagePosition.x}
-            y={stagePosition.y}
-            draggable
-            onDragEnd={(e) => setStagePosition({ x: e.target.x(), y: e.target.y() })}
+            width={stageSize.width}
+            height={stageSize.height}
+            scaleX={scale}
+            scaleY={scale}
+            x={position.x}
+            y={position.y}
+            draggable={layoutMode === 'manual'}
+            onWheel={handleWheel}
+            onDragStart={handleStageDragStart}
+            onDragEnd={handleStageDragEnd}
           >
             <Layer>
               {/* Generation level indicators */}
@@ -536,16 +681,19 @@ const FamilyTreeCanvas = () => {
       
       {/* Canvas Action Toolbar */}
       <CanvasActionToolbar
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onZoomReset={handleZoomReset}
+        onZoomIn={zoomIn}
+        onZoomOut={zoomOut}
+        onZoomReset={resetZoom}
         onSave={handleSave}
         onUndo={handleUndo}
         onRedo={handleRedo}
         canUndo={canUndo}
         canRedo={canRedo}
-        zoomLevel={Math.round(stageScale * 100)}
+        zoomLevel={zoomPercentage}
         hasUnsavedChanges={hasUnsavedChanges}
+        onAutoLayout={applyAutoLayout}
+        onHierarchicalLayout={applyHierarchicalLayout}
+        layoutMode={layoutMode}
       />
       
       {/* Export Modal */}

@@ -76,6 +76,11 @@ export const useGenealogyTree = (initialMembers = []) => {
     }
   }, [familyMembers, selectedMember, saveToHistory]);
 
+  const updateAllMembers = useCallback((newMembers) => {
+    setFamilyMembers(newMembers);
+    saveToHistory(newMembers);
+  }, [saveToHistory]);
+
   const deleteMember = useCallback((memberId) => {
     // Remove member and clean up relationships
     const updatedMembers = familyMembers
@@ -269,6 +274,7 @@ export const useGenealogyTree = (initialMembers = []) => {
     // CRUD operations
     addMember,
     updateMember,
+    updateAllMembers,
     deleteMember,
     
     // Relationship operations
