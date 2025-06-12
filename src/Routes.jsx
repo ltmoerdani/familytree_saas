@@ -11,6 +11,7 @@ import MemberProfile from "pages/member-profile";
 import ImportData from "pages/import-data";
 import ExportShare from "pages/export-share";
 import GenealogyTreeDemo from "components/ui/GenealogyTreeDemo";
+import DragDropConnectionsDemo from "components/ui/DragDropConnectionsDemo";
 
 const Routes = () => {
   return (
@@ -25,6 +26,7 @@ const Routes = () => {
           <Route path="/import-data" element={<ImportData />} />
           <Route path="/export-share" element={<ExportShare />} />
           <Route path="/demo" element={<GenealogyTreeDemo />} />
+          <Route path="/dragdrop-demo" element={<DragDropConnectionsDemo />} />
           <Route path="/" element={<LoginRegister />} />
         </RouterRoutes>
       </ErrorBoundary>

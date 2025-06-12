@@ -14,6 +14,7 @@ const FamilyMemberCard = ({
   isDragging = false,
   onSelect,
   onDragStart,
+  onDragMove,
   onDragEnd,
   onDoubleClick 
 }) => {
@@ -76,7 +77,8 @@ const FamilyMemberCard = ({
       y={member.y}
       draggable
       onDragStart={() => onDragStart?.(member)}
-      onDragEnd={(e) => onDragEnd?.(e, member)}
+      onDragMove={(e) => onDragMove?.(member, { x: e.target.x(), y: e.target.y() })}
+      onDragEnd={(e) => onDragEnd?.(member, { x: e.target.x(), y: e.target.y() })}
       onClick={() => onSelect?.(member)}
       onDblClick={() => onDoubleClick?.(member)}
       opacity={isDragging ? 0.7 : 1}
@@ -263,6 +265,7 @@ FamilyMemberCard.propTypes = {
   isDragging: PropTypes.bool,
   onSelect: PropTypes.func,
   onDragStart: PropTypes.func,
+  onDragMove: PropTypes.func,
   onDragEnd: PropTypes.func,
   onDoubleClick: PropTypes.func
 };
@@ -272,6 +275,7 @@ FamilyMemberCard.defaultProps = {
   isDragging: false,
   onSelect: null,
   onDragStart: null,
+  onDragMove: null,
   onDragEnd: null,
   onDoubleClick: null
 };

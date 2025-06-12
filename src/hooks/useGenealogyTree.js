@@ -25,8 +25,6 @@ export const useGenealogyTree = (initialMembers = []) => {
   
   const validationErrors = useMemo(() => validateFamilyRelationships(familyMembers), [familyMembers]);
 
-  const optimizedMembers = useMemo(() => calculateOptimalLayout(familyMembers), [familyMembers]);
-
   // Fungsi untuk menyimpan state ke history
   const saveToHistory = useCallback((newMembers) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -80,6 +78,12 @@ export const useGenealogyTree = (initialMembers = []) => {
     setFamilyMembers(newMembers);
     saveToHistory(newMembers);
   }, [saveToHistory]);
+
+  // Update members without saving to history (untuk drag operations)
+  const updateMembersForDrag = useCallback((newMembers) => {
+    setFamilyMembers(newMembers);
+    setHasUnsavedChanges(true);
+  }, []);
 
   const deleteMember = useCallback((memberId) => {
     // Remove member and clean up relationships
@@ -261,7 +265,7 @@ export const useGenealogyTree = (initialMembers = []) => {
 
   return {
     // State
-    familyMembers: optimizedMembers,
+    familyMembers: familyMembers, // Return raw familyMembers untuk real-time updates
     selectedMember,
     hasUnsavedChanges,
     generations,
@@ -275,6 +279,7 @@ export const useGenealogyTree = (initialMembers = []) => {
     addMember,
     updateMember,
     updateAllMembers,
+    updateMembersForDrag,
     deleteMember,
     
     // Relationship operations

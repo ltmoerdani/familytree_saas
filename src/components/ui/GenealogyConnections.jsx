@@ -1,5 +1,5 @@
 // filepath: src/components/ui/GenealogyConnections.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Line, Group } from 'react-konva';
 
@@ -11,20 +11,72 @@ const GenealogyConnections = ({ familyMembers }) => {
   const CARD_WIDTH = 120;
   const CARD_HEIGHT = 140;
   
-  // Fungsi untuk mendapatkan titik tengah kartu
-  const getCardCenter = (member) => ({
-    x: member.x + CARD_WIDTH / 2,
-    y: member.y + CARD_HEIGHT / 2
-  });
-
+  // Konstanta untuk jarak koneksi yang konsisten
+  const CONNECTION_CONSTANTS = {
+    MARRIAGE_TO_CHILDREN_DISTANCE: 30,
+    CHILDREN_HORIZONTAL_DISTANCE: 30
+  };
+  
   // Fungsi untuk mendapatkan titik koneksi atas kartu
   const getCardTopConnection = (member) => ({
     x: member.x + CARD_WIDTH / 2,
     y: member.y
   });
 
+  // Fungsi untuk mendapatkan titik koneksi kiri kartu (untuk pernikahan)
+  const getCardLeftConnection = (member) => ({
+    x: member.x,
+    y: member.y + CARD_HEIGHT / 2
+  });
+
+  // Fungsi untuk mendapatkan titik koneksi kanan kartu (untuk pernikahan)
+  const getCardRightConnection = (member) => ({
+    x: member.x + CARD_WIDTH,
+    y: member.y + CARD_HEIGHT / 2
+  });
+
+  // Helper function untuk mendapatkan titik koneksi pernikahan yang konsisten
+  const getMarriageConnectionPoints = (member1, member2) => {
+    let member1Connection, member2Connection;
+    
+    if (member1.x < member2.x) {
+      // Member1 di kiri, member2 di kanan
+      member1Connection = getCardRightConnection(member1);
+      member2Connection = getCardLeftConnection(member2);
+    } else {
+      // Member1 di kanan, member2 di kiri
+      member1Connection = getCardLeftConnection(member1);
+      member2Connection = getCardRightConnection(member2);
+    }
+    
+    const midX = (member1Connection.x + member2Connection.x) / 2;
+    const midY = (member1Connection.y + member2Connection.y) / 2;
+    
+    return {
+      member1Connection,
+      member2Connection,
+      midX,
+      midY
+    };
+  };
+
+  // Memoize marriage connections untuk optimasi performa
+  const marriageConnections = useMemo(() => {
+    return renderMarriageConnections();
+  }, [familyMembers]);
+
+  // Memoize parent-child connections untuk optimasi performa  
+  const parentChildConnections = useMemo(() => {
+    return renderParentChildConnections();
+  }, [familyMembers]);
+
+  // Memoize generation lines untuk optimasi performa
+  const generationConnections = useMemo(() => {
+    return renderGenerationLines();
+  }, [familyMembers]);
+
   // Fungsi untuk menggambar garis pernikahan
-  const renderMarriageConnections = () => {
+  function renderMarriageConnections() {
     const marriageLines = [];
     const processedPairs = new Set();
 
@@ -35,37 +87,36 @@ const GenealogyConnections = ({ familyMembers }) => {
           processedPairs.add(`${member.id}-${member.spouseId}`);
           processedPairs.add(`${member.spouseId}-${member.id}`);
 
-          const memberCenter = getCardCenter(member);
-          const spouseCenter = getCardCenter(spouse);
+          // Gunakan helper function untuk mendapatkan titik koneksi yang konsisten
+          const connectionPoints = getMarriageConnectionPoints(member, spouse);
           
-          // Garis pernikahan horizontal dengan sedikit offset ke bawah
-          const marriageY = Math.max(memberCenter.y, spouseCenter.y) + 10;
-          
+          // Garis pernikahan horizontal langsung
           marriageLines.push(
-            <Group key={`marriage-${member.id}-${spouse.id}`}>
-              {/* Garis horizontal pernikahan */}
+            <Line
+              key={`marriage-${member.id}-${spouse.id}`}
+              points={[
+                connectionPoints.member1Connection.x, connectionPoints.member1Connection.y,
+                connectionPoints.member2Connection.x, connectionPoints.member2Connection.y
+              ]}
+              stroke="#8B4513"
+              strokeWidth={3}
+            />
+          );
+          
+          // Garis vertikal ke bawah untuk anak-anak jika ada
+          if (member.children && member.children.length > 0) {
+            marriageLines.push(
               <Line
+                key={`marriage-to-children-${member.id}-${spouse.id}`}
                 points={[
-                  Math.min(memberCenter.x, spouseCenter.x), marriageY,
-                  Math.max(memberCenter.x, spouseCenter.x), marriageY
+                  connectionPoints.midX, connectionPoints.midY,
+                  connectionPoints.midX, connectionPoints.midY + CONNECTION_CONSTANTS.MARRIAGE_TO_CHILDREN_DISTANCE
                 ]}
                 stroke="#8B4513"
-                strokeWidth={3}
-              />
-              
-              {/* Garis vertikal dari setiap pasangan ke garis pernikahan */}
-              <Line
-                points={[memberCenter.x, memberCenter.y, memberCenter.x, marriageY]}
-                stroke="#8B4513"
                 strokeWidth={2}
               />
-              <Line
-                points={[spouseCenter.x, spouseCenter.y, spouseCenter.x, marriageY]}
-                stroke="#8B4513"
-                strokeWidth={2}
-              />
-            </Group>
-          );
+            );
+          }
         }
       }
     });
@@ -74,7 +125,7 @@ const GenealogyConnections = ({ familyMembers }) => {
   };
 
   // Fungsi untuk menggambar garis orang tua-anak
-  const renderParentChildConnections = () => {
+  function renderParentChildConnections() {
     const parentChildLines = [];
     
     // Grup anak berdasarkan pasangan orang tua
@@ -100,11 +151,10 @@ const GenealogyConnections = ({ familyMembers }) => {
       const parent2 = familyMembers.find(m => m.id === parent2Id);
       
       if (parent1 && parent2 && family.children.length > 0) {
-        // Titik tengah antara kedua orang tua
-        const parent1Center = getCardCenter(parent1);
-        const parent2Center = getCardCenter(parent2);
-        const parentsMidX = (parent1Center.x + parent2Center.x) / 2;
-        const parentsY = Math.max(parent1Center.y, parent2Center.y) + 10; // Garis pernikahan
+        // Gunakan helper function yang sama untuk mendapatkan titik tengah pernikahan
+        const connectionPoints = getMarriageConnectionPoints(parent1, parent2);
+        const marriageMidX = connectionPoints.midX;
+        const marriageMidY = connectionPoints.midY;
         
         // Urutkan anak berdasarkan posisi X
         const sortedChildren = family.children.sort((a, b) => a.x - b.x);
@@ -116,13 +166,13 @@ const GenealogyConnections = ({ familyMembers }) => {
           
           parentChildLines.push(
             <Group key={`family-${parentKey}`}>
-              {/* Garis dari titik tengah orang tua ke anak */}
+              {/* Garis dari titik tengah pernikahan ke anak */}
               <Line
                 points={[
-                  parentsMidX, parentsY,
-                  parentsMidX, parentsY + 30,
-                  childTop.x, parentsY + 30,
-                  childTop.x, childTop.y
+                  marriageMidX, marriageMidY + CONNECTION_CONSTANTS.MARRIAGE_TO_CHILDREN_DISTANCE, // Mulai dari bawah garis pernikahan
+                  marriageMidX, childTop.y - CONNECTION_CONSTANTS.CHILDREN_HORIZONTAL_DISTANCE,   // Turun ke atas area anak
+                  childTop.x, childTop.y - CONNECTION_CONSTANTS.CHILDREN_HORIZONTAL_DISTANCE,     // Horizontal ke anak
+                  childTop.x, childTop.y           // Turun ke kartu anak
                 ]}
                 stroke="#654321"
                 strokeWidth={2}
@@ -130,32 +180,37 @@ const GenealogyConnections = ({ familyMembers }) => {
             </Group>
           );
         } else {
-          // Beberapa anak - sistem T-junction
+          // Beberapa anak - sistem T-junction dengan distribusi line yang dinamis
           const firstChild = sortedChildren[0];
           const lastChild = sortedChildren[sortedChildren.length - 1];
           const firstChildTop = getCardTopConnection(firstChild);
           const lastChildTop = getCardTopConnection(lastChild);
           
           // Garis horizontal menghubungkan semua anak
-          const childrenConnectionY = firstChildTop.y - 30;
+          const childrenConnectionY = firstChildTop.y - CONNECTION_CONSTANTS.CHILDREN_HORIZONTAL_DISTANCE;
+          
+          // Hitung range horizontal yang mencakup semua posisi (parent dan children)
+          const allXPositions = [marriageMidX, firstChildTop.x, lastChildTop.x];
+          const minX = Math.min(...allXPositions);
+          const maxX = Math.max(...allXPositions);
           
           parentChildLines.push(
             <Group key={`family-${parentKey}`}>
               {/* Garis vertikal dari orang tua ke garis horizontal anak */}
               <Line
                 points={[
-                  parentsMidX, parentsY,
-                  parentsMidX, childrenConnectionY
+                  marriageMidX, marriageMidY + CONNECTION_CONSTANTS.MARRIAGE_TO_CHILDREN_DISTANCE,
+                  marriageMidX, childrenConnectionY
                 ]}
                 stroke="#654321"
                 strokeWidth={2}
               />
               
-              {/* Garis horizontal menghubungkan semua anak */}
+              {/* Garis horizontal yang melebar mengikuti posisi parent dan children */}
               <Line
                 points={[
-                  firstChildTop.x, childrenConnectionY,
-                  lastChildTop.x, childrenConnectionY
+                  minX, childrenConnectionY,
+                  maxX, childrenConnectionY
                 ]}
                 stroke="#654321"
                 strokeWidth={2}
@@ -186,7 +241,7 @@ const GenealogyConnections = ({ familyMembers }) => {
   };
 
   // Fungsi untuk menggambar garis generasi (opsional)
-  const renderGenerationLines = () => {
+  function renderGenerationLines() {
     const generations = {};
     
     // Grup anggota berdasarkan generasi
@@ -224,13 +279,13 @@ const GenealogyConnections = ({ familyMembers }) => {
   return (
     <Group>
       {/* Garis generasi (background) */}
-      {renderGenerationLines()}
+      {generationConnections}
       
       {/* Garis orang tua-anak */}
-      {renderParentChildConnections()}
+      {parentChildConnections}
       
       {/* Garis pernikahan */}
-      {renderMarriageConnections()}
+      {marriageConnections}
     </Group>
   );
 };

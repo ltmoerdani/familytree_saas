@@ -9,7 +9,6 @@ import Minimap from 'components/ui/Minimap';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
 import { useGenealogyTree } from 'hooks/useGenealogyTree';
-import { useDragAndDrop } from 'hooks/useDragAndDrop';
 import { useCanvasControls } from 'hooks/useCanvasControls';
 import { calculateAutoLayout, calculateHierarchicalLayout, getLayoutBounds, centerLayout } from 'utils/autoLayout';
 
@@ -157,8 +156,8 @@ const FamilyTreeCanvas = () => {
     hasUnsavedChanges,
     generations,
     setSelectedMember,
-    updateMemberPosition,
     updateAllMembers,
+    updateMembersForDrag,
     undo,
     redo,
     canUndo,
@@ -187,14 +186,38 @@ const FamilyTreeCanvas = () => {
     zoomPercentage
   } = useCanvasControls(1, { x: 0, y: 0 });
 
-  // Enhanced drag and drop hook
-  const {
-    handleDragStart,
-    handleDragEnd,
-    isDragging
-  } = useDragAndDrop((member, newPosition) => {
-    updateMemberPosition(member.id, newPosition.x, newPosition.y);
-  });
+  // Real-time drag and drop implementation (sama seperti demo yang berhasil)
+  const [isDragging, setIsDragging] = useState(null);
+
+  const handleDragStart = (member) => {
+    setIsDragging(member.id);
+  };
+
+  const handleDragMove = (member, newPosition) => {
+    // Update posisi secara real-time saat drag - sama seperti demo, tanpa history
+    const updatedMembers = familyMembers.map(m => 
+      m.id === member.id 
+        ? { ...m, x: newPosition.x, y: newPosition.y }
+        : m
+    );
+    updateMembersForDrag(updatedMembers);
+  };
+
+  const handleDragEnd = (member, newPosition) => {
+    setIsDragging(null);
+    
+    // Final update posisi member - sama seperti demo, dengan history
+    const updatedMembers = familyMembers.map(m => 
+      m.id === member.id 
+        ? { ...m, x: newPosition.x, y: newPosition.y }
+        : m
+    );
+    updateAllMembers(updatedMembers);
+  };
+
+  const isCardDragging = (member) => {
+    return isDragging === member.id;
+  };
 
   // Update canvas size on resize
   useEffect(() => {
@@ -270,15 +293,6 @@ const FamilyTreeCanvas = () => {
     setSelectedMember(member);
     setIsRightPanelOpen(true);
   }, [setSelectedMember]);
-
-  // Updated drag handlers to use the enhanced hook
-  const handleMemberDragStart = useCallback((member, event) => {
-    handleDragStart(member, event);
-  }, [handleDragStart]);
-
-  const handleMemberDragEnd = useCallback((e, member) => {
-    handleDragEnd(e);
-  }, [handleDragEnd]);
 
   // Export functionality
   const handleExport = (format) => {
@@ -545,10 +559,11 @@ const FamilyTreeCanvas = () => {
                   key={member.id} 
                   member={member}
                   isSelected={selectedMember?.id === member.id}
-                  isDragging={isDragging(member)}
+                  isDragging={isCardDragging(member)}
                   onSelect={handleMemberSelect}
-                  onDragStart={handleMemberDragStart}
-                  onDragEnd={handleMemberDragEnd}
+                  onDragStart={handleDragStart}
+                  onDragMove={handleDragMove}
+                  onDragEnd={handleDragEnd}
                 />
               ))}
             </Layer>
