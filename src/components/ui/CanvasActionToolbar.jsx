@@ -132,8 +132,8 @@ const CanvasActionToolbar = ({
 
   return (
     <>
-      {/* Desktop Toolbar */}
-      <div className="hidden md:flex fixed top-28 left-1/2 transform -translate-x-1/2 bg-background border border-border rounded-lg shadow-card z-1000">
+      {/* Desktop Toolbar - significantly adjusted vertical position */}
+      <div className="hidden md:flex fixed top-32 left-1/2 transform -translate-x-1/2 bg-background border border-border rounded-lg shadow-card z-1000">
         <div className="flex items-center px-2 py-2 space-x-1">
           {toolbarItems.map(item => {
             if (item.type === 'divider') {
