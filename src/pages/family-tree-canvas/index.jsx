@@ -18,148 +18,123 @@ import {
 } from 'utils/autoLayout';
 
 const FamilyTreeCanvas = () => {
-  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
+  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [layoutMode, setLayoutMode] = useState('manual'); // 'auto', 'hierarchical', 'manual'
-  const [showMinimap, setShowMinimap] = useState(true);
+  const [layoutMode, setLayoutMode] = useState('manual');
+  const [showMinimap] = useState(true);
 
-  // Initialize with mock data
+  // Initialize with improved layout data matching the reference
   const initialMembers = [
+    // Generation 1 - Grandparents
     {
-      id: 'member-1',
-      firstName: 'Robert',
-      lastName: 'Johnson',
-      birthDate: '1925-03-15',
-      deathDate: '1995-08-22',
+      id: 'grandpa',
+      firstName: 'Abdul Rahman',
+      lastName: '',
+      birthDate: '1960-01-01',
+      deathDate: '2023-12-31',
       photo:
         'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       generation: 1,
-      x: 400,
-      y: 50,
+      x: 1000,
+      y: 80,
       gender: 'male',
-      spouseId: 'member-2',
-      children: ['member-3', 'member-4'],
+      spouseId: 'grandma',
+      children: ['father', 'uncle'],
+      occupation: 'Kepala Keluarga',
+      location: 'Indonesia',
     },
     {
-      id: 'member-2',
-      firstName: 'Mary',
-      lastName: 'Johnson',
-      birthDate: '1928-07-10',
-      deathDate: '1998-12-05',
+      id: 'grandma',
+      firstName: 'Zulmelia',
+      lastName: '',
+      birthDate: '1962-03-15',
+      deathDate: null,
       photo:
         'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
       generation: 1,
-      x: 600,
-      y: 50,
+      x: 650,
+      y: 80,
       gender: 'female',
-      spouseId: 'member-1',
-      children: ['member-3', 'member-4'],
+      spouseId: 'grandpa',
+      children: ['father', 'uncle'],
+      occupation: 'Ibu Rumah Tangga',
+      location: 'Indonesia',
     },
+
+    // Generation 2 - Parents
     {
-      id: 'member-3',
-      firstName: 'David',
-      lastName: 'Johnson',
-      birthDate: '1952-11-20',
+      id: 'father',
+      firstName: 'Zulharman Maddani',
+      lastName: '',
+      birthDate: '1994-05-20',
       deathDate: null,
       photo:
         'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
       generation: 2,
-      x: 300,
-      y: 250,
+      x: 1000,
+      y: 350,
       gender: 'male',
-      spouseId: 'member-5',
-      children: ['member-6', 'member-7'],
-      parents: ['member-1', 'member-2'],
+      spouseId: null,
+      children: [],
+      parents: ['grandpa', 'grandma'],
+      occupation: 'Profesional',
+      location: 'Indonesia',
     },
     {
-      id: 'member-4',
-      firstName: 'Susan',
-      lastName: 'Wilson',
-      birthDate: '1955-04-08',
+      id: 'aunt1',
+      firstName: 'Dita Yunita Rahman',
+      lastName: '',
+      birthDate: '1992-08-10',
       deathDate: null,
       photo:
         'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
       generation: 2,
-      x: 700,
-      y: 250,
+      x: 350,
+      y: 350,
       gender: 'female',
-      spouseId: 'member-8',
-      children: ['member-9'],
-      parents: ['member-1', 'member-2'],
+      spouseId: null,
+      children: [],
+      parents: ['grandpa', 'grandma'],
+      occupation: 'Dita',
+      location: 'Indonesia',
     },
     {
-      id: 'member-5',
-      firstName: 'Linda',
-      lastName: 'Johnson',
-      birthDate: '1954-09-12',
+      id: 'aunt2',
+      firstName: 'Ismi Tri Oktaviani',
+      lastName: '',
+      birthDate: '1996-11-25',
       deathDate: null,
       photo:
         'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
       generation: 2,
-      x: 500,
-      y: 250,
+      x: 650,
+      y: 350,
       gender: 'female',
-      spouseId: 'member-3',
-      children: ['member-6', 'member-7'],
+      spouseId: null,
+      children: [],
+      parents: ['grandpa', 'grandma'],
+      occupation: 'Profesional',
+      location: 'Indonesia',
     },
     {
-      id: 'member-6',
-      firstName: 'Michael',
-      lastName: 'Johnson',
-      birthDate: '1978-02-14',
-      deathDate: null,
-      photo:
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      generation: 3,
-      x: 200,
-      y: 450,
-      gender: 'male',
-      parents: ['member-3', 'member-5'],
-    },
-    {
-      id: 'member-7',
-      firstName: 'Jennifer',
-      lastName: 'Johnson',
-      birthDate: '1980-06-25',
-      deathDate: null,
-      photo:
-        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face',
-      generation: 3,
-      x: 400,
-      y: 450,
-      gender: 'female',
-      parents: ['member-3', 'member-5'],
-    },
-    {
-      id: 'member-8',
-      firstName: 'James',
-      lastName: 'Wilson',
-      birthDate: '1953-12-03',
+      id: 'uncle',
+      firstName: 'Laksmana Tri Moerdani',
+      lastName: '',
+      birthDate: '1984-07-15',
       deathDate: null,
       photo:
         'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
       generation: 2,
-      x: 900,
-      y: 250,
+      x: 1350,
+      y: 350,
       gender: 'male',
-      spouseId: 'member-4',
-      children: ['member-9'],
-    },
-    {
-      id: 'member-9',
-      firstName: 'Emily',
-      lastName: 'Wilson',
-      birthDate: '1982-10-18',
-      deathDate: null,
-      photo:
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
-      generation: 3,
-      x: 800,
-      y: 450,
-      gender: 'female',
-      parents: ['member-4', 'member-8'],
+      spouseId: null,
+      children: [],
+      parents: ['grandpa', 'grandma'],
+      occupation: 'Profesional',
+      location: 'Indonesia',
     },
   ];
 
@@ -180,7 +155,7 @@ const FamilyTreeCanvas = () => {
     markAsSaved,
   } = useGenealogyTree(initialMembers);
 
-  // Enhanced canvas controls with zoom, pan, and minimap
+  // Enhanced canvas controls
   const {
     scale,
     position,
@@ -200,7 +175,7 @@ const FamilyTreeCanvas = () => {
     zoomPercentage,
   } = useCanvasControls(1, { x: 0, y: 0 });
 
-  // Real-time drag and drop implementation (sama seperti demo yang berhasil)
+  // Real-time drag and drop implementation
   const [isDragging, setIsDragging] = useState(null);
 
   const handleDragStart = member => {
@@ -208,7 +183,6 @@ const FamilyTreeCanvas = () => {
   };
 
   const handleDragMove = (member, newPosition) => {
-    // Update posisi secara real-time saat drag - sama seperti demo, tanpa history
     const updatedMembers = familyMembers.map(m =>
       m.id === member.id ? { ...m, x: newPosition.x, y: newPosition.y } : m
     );
@@ -217,8 +191,6 @@ const FamilyTreeCanvas = () => {
 
   const handleDragEnd = (member, newPosition) => {
     setIsDragging(null);
-
-    // Final update posisi member - sama seperti demo, dengan history
     const updatedMembers = familyMembers.map(m =>
       m.id === member.id ? { ...m, x: newPosition.x, y: newPosition.y } : m
     );
@@ -232,8 +204,8 @@ const FamilyTreeCanvas = () => {
   // Update canvas size on resize
   useEffect(() => {
     const handleResize = () => {
-      const leftPanelWidth = isLeftPanelOpen ? 320 : 0;
-      const rightPanelWidth = isRightPanelOpen ? 320 : 0;
+      const leftPanelWidth = isLeftPanelOpen ? 280 : 0;
+      const rightPanelWidth = isRightPanelOpen ? 350 : 0;
       const width = window.innerWidth - leftPanelWidth - rightPanelWidth;
       const height = window.innerHeight - 112;
       updateStageSize(width, height);
@@ -276,7 +248,7 @@ const FamilyTreeCanvas = () => {
   // Mock active tree data
   const activeTree = {
     id: 'tree-1',
-    name: 'The Johnson Family Tree',
+    name: 'The Rahman Family Tree',
     createdAt: '2024-01-15',
     lastModified: '2024-01-20',
   };
@@ -285,7 +257,7 @@ const FamilyTreeCanvas = () => {
   const generationLevels = Object.keys(generations)
     .map(gen => ({
       level: parseInt(gen),
-      y: 50 + (parseInt(gen) - 1) * 200,
+      y: 50 + (parseInt(gen) - 1) * 270,
       label: `Generation ${gen}`,
     }))
     .sort((a, b) => a.level - b.level);
@@ -295,7 +267,6 @@ const FamilyTreeCanvas = () => {
 
   // Canvas controls
   const handleSave = useCallback(async () => {
-    // Mock save functionality
     await new Promise(resolve => setTimeout(resolve, 1000));
     markAsSaved();
   }, [markAsSaved]);
@@ -308,13 +279,19 @@ const FamilyTreeCanvas = () => {
     redo();
   }, [redo]);
 
-  // Member selection
+  // Member selection with panel toggle
   const handleMemberSelect = useCallback(
     member => {
-      setSelectedMember(member);
-      setIsRightPanelOpen(true);
+      if (selectedMember?.id === member.id) {
+        // If clicking the same member, toggle the panel
+        setIsRightPanelOpen(!isRightPanelOpen);
+      } else {
+        // If clicking a different member, select it and show panel
+        setSelectedMember(member);
+        setIsRightPanelOpen(true);
+      }
     },
-    [setSelectedMember]
+    [selectedMember, isRightPanelOpen, setSelectedMember]
   );
 
   // Export functionality
@@ -344,211 +321,195 @@ const FamilyTreeCanvas = () => {
       <TreeContextIndicator activeTree={activeTree} />
 
       <div className="pt-28 h-screen flex">
-        {/* Left Panel - Member Search & Controls */}
+        {/* Left Panel - Statistics and Controls */}
         <div
-          className={`fixed left-0 top-28 h-full bg-background border-r border-border z-50 transition-transform duration-300 ${
-            isLeftPanelOpen ? 'translate-x-0' : '-translate-x-full'
-          } w-80 md:relative md:translate-x-0 md:w-64`}
+          className={`bg-background border-r border-border transition-all duration-300 ${
+            isLeftPanelOpen ? 'w-80' : 'w-0'
+          } overflow-hidden flex-shrink-0`}
         >
-          <div className="p-4 h-full overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading font-semibold text-lg text-text-primary">
-                Family Members
+          <div className="p-6 h-full overflow-y-auto">
+            {/* Statistics Section */}
+            <div className="mb-8">
+              <h3 className="font-heading font-semibold text-lg text-text-primary mb-4">
+                Statistik Keluarga
               </h3>
-              <button
-                onClick={() => setIsLeftPanelOpen(false)}
-                className="md:hidden p-1 text-text-secondary hover:text-primary"
-              >
-                <Icon name="X" size={20} />
-              </button>
+
+              {/* Total Members */}
+              <div className="bg-primary-50 rounded-lg p-4 mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <Icon name="Users" size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">
+                      {familyMembers.length}
+                    </div>
+                    <div className="text-sm text-primary">Total Anggota</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Generations */}
+              <div className="bg-success-50 rounded-lg p-4 mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
+                    <Icon name="TreePine" size={20} className="text-success" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-success">
+                      {Object.keys(generations).length}
+                    </div>
+                    <div className="text-sm text-success">Generasi</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gender Distribution */}
+              <div className="mb-4">
+                <h4 className="font-medium text-text-primary mb-3">
+                  Distribusi Gender
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-blue-50 rounded-lg p-3 text-center">
+                    <div className="text-xl font-bold text-blue-600">
+                      {familyMembers.filter(m => m.gender === 'male').length}
+                    </div>
+                    <div className="text-sm text-blue-600">Laki-laki</div>
+                  </div>
+                  <div className="bg-pink-50 rounded-lg p-3 text-center">
+                    <div className="text-xl font-bold text-pink-600">
+                      {familyMembers.filter(m => m.gender === 'female').length}
+                    </div>
+                    <div className="text-sm text-pink-600">Perempuan</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Layout Controls */}
+            <div className="mb-6">
+              <h4 className="font-medium text-text-primary mb-3">
+                Layout Controls
+              </h4>
+              <div className="space-y-2">
+                <button
+                  onClick={applyAutoLayout}
+                  className="w-full flex items-center space-x-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-smooth"
+                >
+                  <Icon name="Shuffle" size={16} />
+                  <span>Auto Layout</span>
+                </button>
+                <button
+                  onClick={zoomToFit}
+                  className="w-full flex items-center space-x-2 px-3 py-2 bg-surface text-text-primary border border-border rounded-lg hover:bg-secondary-100 transition-smooth"
+                >
+                  <Icon name="Maximize2" size={16} />
+                  <span>Fit View</span>
+                </button>
+              </div>
             </div>
 
             {/* Search */}
-            <div className="relative mb-4">
-              <Icon
-                name="Search"
-                size={16}
-                className="absolute left-3 top-3 text-text-secondary"
-              />
-              <input
-                type="text"
-                placeholder="Search family members..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
-              />
-            </div>
-
-            {/* Add Member Button */}
-            <button className="w-full bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-600 transition-smooth mb-4 flex items-center justify-center space-x-2">
-              <Icon name="Plus" size={16} />
-              <span>Add Family Member</span>
-            </button>
-
-            {/* Generation Filters */}
-            <div className="mb-4">
-              <h4 className="font-medium text-text-primary mb-2">
-                Generations
+            <div className="mb-6">
+              <h4 className="font-medium text-text-primary mb-3">
+                Cari Anggota
               </h4>
-              <div className="space-y-2">
-                {generationLevels.map(gen => (
-                  <label
-                    key={gen.level}
-                    className="flex items-center space-x-2"
-                  >
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                      className="rounded border-border"
-                    />
-                    <span className="text-sm text-text-secondary">
-                      {gen.label}
-                    </span>
-                  </label>
-                ))}
+              <div className="relative">
+                <Icon
+                  name="Search"
+                  size={16}
+                  className="absolute left-3 top-3 text-text-secondary"
+                />
+                <input
+                  type="text"
+                  placeholder="Cari nama..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                />
               </div>
             </div>
 
             {/* Member List */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-text-primary mb-2">
-                Members ({filteredMembers.length})
+            <div>
+              <h4 className="font-medium text-text-primary mb-3">
+                Anggota Keluarga ({filteredMembers.length})
               </h4>
-              {filteredMembers.map(member => (
-                <button
-                  key={member.id}
-                  type="button"
-                  onClick={() => handleMemberSelect(member)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleMemberSelect(member);
-                    }
-                  }}
-                  className={`w-full text-left p-3 rounded-lg border cursor-pointer transition-smooth ${
-                    selectedMember?.id === member.id
-                      ? 'border-primary bg-primary-50'
-                      : 'border-border hover:border-primary-200 hover:bg-surface'
-                  }`}
-                  aria-label={`Select family member ${member.firstName} ${member.lastName}`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                      <Icon name="User" size={16} className="text-primary" />
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {filteredMembers.map(member => (
+                  <button
+                    key={member.id}
+                    onClick={() => handleMemberSelect(member)}
+                    className={`w-full text-left p-3 rounded-lg border transition-smooth ${
+                      selectedMember?.id === member.id
+                        ? 'border-primary bg-primary-50'
+                        : 'border-border hover:border-primary-200 hover:bg-surface'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                        <Icon name="User" size={16} className="text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-text-primary truncate">
+                          {member.firstName} {member.lastName}
+                        </p>
+                        <p className="text-xs text-text-secondary">
+                          Gen {member.generation} • {member.occupation}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-text-primary truncate">
-                        {member.firstName} {member.lastName}
-                      </p>
-                      <p className="text-xs text-text-secondary">
-                        Born {new Date(member.birthDate).getFullYear()}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Main Canvas Area */}
-        <div className="flex-1 relative overflow-hidden">
+        <div className="flex-1 relative overflow-hidden bg-gray-50">
           {/* Canvas Controls */}
-          <div className="absolute top-4 left-4 z-40 flex flex-col space-y-2">
-            <div className="flex space-x-2">
+          <div className="absolute top-4 left-4 z-40 flex items-center space-x-2">
+            <button
+              onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
+              className="w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth shadow-card"
+              title="Toggle Statistics Panel"
+            >
+              <Icon
+                name={isLeftPanelOpen ? 'PanelLeftClose' : 'PanelLeftOpen'}
+                size={20}
+              />
+            </button>
+
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth shadow-card"
+              title="Export Tree"
+            >
+              <Icon name="Download" size={20} />
+            </button>
+          </div>
+
+          {/* Zoom Controls */}
+          <div className="absolute bottom-4 left-4 z-40 bg-background border border-border rounded-lg shadow-card">
+            <div className="flex flex-col">
               <button
-                onClick={() => setIsLeftPanelOpen(true)}
-                className="md:hidden w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth"
+                onClick={zoomIn}
+                className="p-3 text-text-secondary hover:text-primary hover:bg-surface transition-smooth border-b border-border"
+                title="Zoom In"
               >
-                <Icon name="Menu" size={20} />
+                <Icon name="Plus" size={16} />
               </button>
-
+              <div className="px-3 py-2 text-xs text-center text-text-secondary border-b border-border">
+                {zoomPercentage}%
+              </div>
               <button
-                onClick={() => setIsExportModalOpen(true)}
-                className="w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth"
-                title="Export Tree"
+                onClick={zoomOut}
+                className="p-3 text-text-secondary hover:text-primary hover:bg-surface transition-smooth"
+                title="Zoom Out"
               >
-                <Icon name="Download" size={20} />
+                <Icon name="Minus" size={16} />
               </button>
-            </div>
-
-            {/* Layout Controls */}
-            <div className="bg-background border border-border rounded-lg p-2">
-              <div className="text-xs font-medium text-text-primary mb-2">
-                Layout
-              </div>
-              <div className="flex flex-col space-y-1">
-                <button
-                  onClick={applyAutoLayout}
-                  className={`px-2 py-1 text-xs rounded ${
-                    layoutMode === 'auto'
-                      ? 'bg-primary text-white'
-                      : 'bg-surface text-text-secondary hover:bg-secondary'
-                  }`}
-                >
-                  Auto
-                </button>
-                <button
-                  onClick={applyHierarchicalLayout}
-                  className={`px-2 py-1 text-xs rounded ${
-                    layoutMode === 'hierarchical'
-                      ? 'bg-primary text-white'
-                      : 'bg-surface text-text-secondary hover:bg-secondary'
-                  }`}
-                >
-                  Hierarchical
-                </button>
-                <button
-                  onClick={() => setLayoutMode('manual')}
-                  className={`px-2 py-1 text-xs rounded ${
-                    layoutMode === 'manual'
-                      ? 'bg-primary text-white'
-                      : 'bg-surface text-text-secondary hover:bg-secondary'
-                  }`}
-                >
-                  Manual
-                </button>
-              </div>
-            </div>
-
-            {/* Zoom Controls */}
-            <div className="bg-background border border-border rounded-lg p-2">
-              <div className="text-xs font-medium text-text-primary mb-2">
-                Zoom
-              </div>
-              <div className="flex flex-col space-y-1">
-                <button
-                  onClick={zoomIn}
-                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
-                  title="Zoom In"
-                >
-                  <Icon name="Plus" size={14} />
-                </button>
-                <div className="text-xs text-center text-text-secondary py-1">
-                  {zoomPercentage}%
-                </div>
-                <button
-                  onClick={zoomOut}
-                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
-                  title="Zoom Out"
-                >
-                  <Icon name="Minus" size={14} />
-                </button>
-                <button
-                  onClick={zoomToFit}
-                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
-                  title="Fit to Screen"
-                >
-                  <Icon name="Maximize2" size={12} />
-                </button>
-                <button
-                  onClick={resetZoom}
-                  className="w-8 h-8 bg-surface text-text-secondary hover:bg-secondary rounded flex items-center justify-center"
-                  title="Reset Zoom"
-                >
-                  <Icon name="RotateCcw" size={12} />
-                </button>
-              </div>
             </div>
           </div>
 
@@ -561,16 +522,6 @@ const FamilyTreeCanvas = () => {
               className="top-4 right-4"
             />
           )}
-
-          {/* Minimap Toggle */}
-          <button
-            onClick={() => setShowMinimap(!showMinimap)}
-            className="absolute top-4 right-4 w-8 h-8 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth z-30"
-            title={showMinimap ? 'Hide Minimap' : 'Show Minimap'}
-            style={{ right: showMinimap ? '220px' : '16px' }}
-          >
-            <Icon name={showMinimap ? 'EyeOff' : 'Eye'} size={16} />
-          </button>
 
           {/* Konva Stage */}
           <Stage
@@ -591,15 +542,16 @@ const FamilyTreeCanvas = () => {
               {generationLevels.map(gen => (
                 <React.Fragment key={gen.level}>
                   <Line
-                    points={[0, gen.y - 20, 2000, gen.y - 20]}
+                    points={[0, gen.y - 30, 2000, gen.y - 30]}
                     stroke="#E5E7EB"
                     strokeWidth={1}
                     dash={[5, 5]}
+                    opacity={0.5}
                   />
                   <Text
                     x={20}
-                    y={gen.y - 35}
-                    text={gen.label}
+                    y={gen.y - 50}
+                    text={`Generasi: ${gen.level}`}
                     fontSize={12}
                     fontFamily="Inter"
                     fill="#6B4E3D"
@@ -627,27 +579,28 @@ const FamilyTreeCanvas = () => {
           </Stage>
         </div>
 
-        {/* Right Panel - Member Details */}
+        {/* Right Panel - Member Details (Collapsible) */}
         <div
-          className={`fixed right-0 top-28 h-full bg-background border-l border-border z-50 transition-transform duration-300 ${
-            isRightPanelOpen ? 'translate-x-0' : 'translate-x-full'
-          } w-80 md:relative md:translate-x-0 md:w-64`}
+          className={`bg-background border-l border-border transition-all duration-300 ${
+            isRightPanelOpen ? 'w-96' : 'w-0'
+          } overflow-hidden flex-shrink-0`}
         >
-          <div className="p-4 h-full overflow-y-auto">
+          <div className="p-6 h-full overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-heading font-semibold text-lg text-text-primary">
-                Member Details
+                Detail Anggota
               </h3>
               <button
                 onClick={() => setIsRightPanelOpen(false)}
-                className="md:hidden p-1 text-text-secondary hover:text-primary"
+                className="p-2 text-text-secondary hover:text-primary hover:bg-surface rounded-lg transition-smooth"
+                title="Close Panel"
               >
                 <Icon name="X" size={20} />
               </button>
             </div>
 
             {selectedMember ? (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Photo */}
                 <div className="text-center">
                   <div className="w-24 h-24 bg-secondary rounded-full mx-auto mb-3 flex items-center justify-center overflow-hidden">
@@ -661,79 +614,102 @@ const FamilyTreeCanvas = () => {
                       <Icon name="User" size={32} className="text-primary" />
                     )}
                   </div>
-                  <button className="text-sm text-primary hover:text-primary-600 transition-smooth">
-                    Change Photo
-                  </button>
+                  <h4 className="font-heading font-semibold text-text-primary">
+                    {selectedMember.firstName} {selectedMember.lastName}
+                  </h4>
+                  <p className="text-text-secondary text-sm">
+                    {selectedMember.occupation}
+                  </p>
                 </div>
 
                 {/* Basic Info */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
                     <label
-                      htmlFor="firstName"
-                      className="block text-sm font-medium text-text-primary mb-1"
+                      htmlFor="fullName"
+                      className="block text-sm font-medium text-text-primary mb-2"
                     >
-                      First Name
+                      Nama Lengkap
                     </label>
                     <input
-                      id="firstName"
+                      id="fullName"
                       type="text"
-                      value={selectedMember.firstName}
+                      value={`${selectedMember.firstName} ${selectedMember.lastName}`}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="lastName"
-                      className="block text-sm font-medium text-text-primary mb-1"
-                    >
-                      Last Name
-                    </label>
-                    <input
-                      id="lastName"
-                      type="text"
-                      value={selectedMember.lastName}
-                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                      readOnly
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="birthDate"
-                      className="block text-sm font-medium text-text-primary mb-1"
+                      className="block text-sm font-medium text-text-primary mb-2"
                     >
-                      Birth Date
+                      Tanggal Lahir
                     </label>
                     <input
                       id="birthDate"
                       type="date"
                       value={selectedMember.birthDate}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                      readOnly
                     />
                   </div>
 
                   <div>
                     <label
-                      htmlFor="deathDate"
-                      className="block text-sm font-medium text-text-primary mb-1"
+                      htmlFor="occupation"
+                      className="block text-sm font-medium text-text-primary mb-2"
                     >
-                      Death Date
+                      Pekerjaan
                     </label>
                     <input
-                      id="deathDate"
-                      type="date"
-                      value={selectedMember.deathDate || ''}
+                      id="occupation"
+                      type="text"
+                      value={selectedMember.occupation}
                       className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                      readOnly
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="location"
+                      className="block text-sm font-medium text-text-primary mb-2"
+                    >
+                      Lokasi
+                    </label>
+                    <input
+                      id="location"
+                      type="text"
+                      value={selectedMember.location}
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                      readOnly
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="generation"
+                      className="block text-sm font-medium text-text-primary mb-2"
+                    >
+                      Generasi
+                    </label>
+                    <input
+                      id="generation"
+                      type="text"
+                      value={`Generasi ${selectedMember.generation}`}
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                      readOnly
                     />
                   </div>
                 </div>
 
                 {/* Relationships */}
                 <div>
-                  <h4 className="font-medium text-text-primary mb-2">
-                    Relationships
-                  </h4>
+                  <h5 className="font-medium text-text-primary mb-3">
+                    Hubungan Keluarga
+                  </h5>
                   <div className="space-y-2">
                     {selectedMember.spouseId && (
                       <div className="flex items-center justify-between p-2 bg-surface rounded-lg">
@@ -744,12 +720,9 @@ const FamilyTreeCanvas = () => {
                             className="text-accent"
                           />
                           <span className="text-sm text-text-primary">
-                            Spouse
+                            Pasangan
                           </span>
                         </div>
-                        <button className="text-xs text-primary hover:text-primary-600">
-                          Edit
-                        </button>
                       </div>
                     )}
 
@@ -763,12 +736,25 @@ const FamilyTreeCanvas = () => {
                               className="text-primary"
                             />
                             <span className="text-sm text-text-primary">
-                              {selectedMember.children.length} Children
+                              {selectedMember.children.length} Anak
                             </span>
                           </div>
-                          <button className="text-xs text-primary hover:text-primary-600">
-                            View
-                          </button>
+                        </div>
+                      )}
+
+                    {selectedMember.parents &&
+                      selectedMember.parents.length > 0 && (
+                        <div className="flex items-center justify-between p-2 bg-surface rounded-lg">
+                          <div className="flex items-center space-x-2">
+                            <Icon
+                              name="Users"
+                              size={16}
+                              className="text-secondary"
+                            />
+                            <span className="text-sm text-text-primary">
+                              {selectedMember.parents.length} Orang Tua
+                            </span>
+                          </div>
                         </div>
                       )}
                   </div>
@@ -777,10 +763,10 @@ const FamilyTreeCanvas = () => {
                 {/* Actions */}
                 <div className="pt-4 border-t border-border space-y-2">
                   <button className="w-full bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-600 transition-smooth">
-                    Save Changes
+                    Edit Detail
                   </button>
                   <button className="w-full bg-surface text-text-primary px-4 py-2 rounded-lg font-medium hover:bg-secondary-100 transition-smooth border border-border">
-                    Delete Member
+                    Lihat di Pohon
                   </button>
                 </div>
               </div>
@@ -792,7 +778,7 @@ const FamilyTreeCanvas = () => {
                   className="text-text-secondary mx-auto mb-4"
                 />
                 <p className="text-text-secondary">
-                  Select a family member to view and edit their details
+                  Klik pada kartu anggota keluarga untuk melihat detail
                 </p>
               </div>
             )}
@@ -863,36 +849,10 @@ const FamilyTreeCanvas = () => {
                   </div>
                 </div>
               </button>
-
-              <button
-                onClick={() => handleExport('pdf')}
-                className="w-full flex items-center space-x-3 p-4 border border-border rounded-lg hover:border-primary-200 hover:bg-surface transition-smooth"
-              >
-                <Icon name="FileText" size={20} className="text-error" />
-                <div className="text-left">
-                  <div className="font-medium text-text-primary">
-                    PDF Document
-                  </div>
-                  <div className="text-sm text-text-secondary">
-                    Printable document format
-                  </div>
-                </div>
-              </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Mobile Panel Toggle */}
-      <div className="md:hidden fixed bottom-6 left-4 z-40">
-        <button
-          onClick={() => setIsRightPanelOpen(true)}
-          className="w-12 h-12 bg-primary text-white rounded-full shadow-modal flex items-center justify-center transition-smooth hover:bg-primary-600"
-          title="Member Details"
-        >
-          <Icon name="User" size={20} />
-        </button>
-      </div>
     </div>
   );
 };

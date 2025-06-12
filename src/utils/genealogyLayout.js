@@ -1,33 +1,26 @@
 // filepath: src/utils/genealogyLayout.js
 /**
- * Utilitas untuk layout genealogy tree yang mengikuti standar
- * Membantu dalam positioning anggota keluarga dan perhitungan koneksi
+ * Enhanced genealogy layout utilities matching reference design
  */
 
-// Konstanta layout
+// Enhanced layout constants for better spacing
 export const LAYOUT_CONFIG = {
-  CARD_WIDTH: 120,
-  CARD_HEIGHT: 140,
-  GENERATION_GAP: 200,
-  SIBLING_GAP: 150,
-  MARRIAGE_GAP: 50,
-  PARENT_CHILD_VERTICAL_GAP: 60,
-  CONNECTION_OFFSET: 30,
+  CARD_WIDTH: 160,
+  CARD_HEIGHT: 180,
+  GENERATION_GAP: 270,
+  SIBLING_GAP: 200,
+  MARRIAGE_GAP: 60,
+  PARENT_CHILD_VERTICAL_GAP: 80,
+  CONNECTION_OFFSET: 40,
 };
 
 /**
- * Menghitung posisi optimal untuk anggota keluarga
- * @param {Array} familyMembers - Array anggota keluarga
- * @returns {Array} Array anggota keluarga dengan posisi yang dioptimalkan
+ * Calculate optimal layout for family members with improved spacing
  */
 export const calculateOptimalLayout = familyMembers => {
-  // Grup berdasarkan generasi
   const generations = groupByGeneration(familyMembers);
-
-  // Hitung posisi Y untuk setiap generasi
   const generationYPositions = calculateGenerationYPositions(generations);
 
-  // Hitung posisi X untuk setiap generasi
   const updatedMembers = familyMembers.map(member => {
     const generationY = generationYPositions[member.generation];
     return {
@@ -36,14 +29,11 @@ export const calculateOptimalLayout = familyMembers => {
     };
   });
 
-  // Optimalkan posisi X untuk setiap generasi
   return optimizeXPositions(updatedMembers, generations);
 };
 
 /**
- * Mengelompokkan anggota keluarga berdasarkan generasi
- * @param {Array} familyMembers - Array anggota keluarga
- * @returns {Object} Object dengan key generasi dan value array anggota
+ * Group family members by generation
  */
 export const groupByGeneration = familyMembers => {
   return familyMembers.reduce((acc, member) => {
@@ -56,9 +46,7 @@ export const groupByGeneration = familyMembers => {
 };
 
 /**
- * Menghitung posisi Y untuk setiap generasi
- * @param {Object} generations - Object generasi
- * @returns {Object} Object dengan key generasi dan value posisi Y
+ * Calculate Y positions for each generation with improved spacing
  */
 export const calculateGenerationYPositions = generations => {
   const generationNumbers = Object.keys(generations)
@@ -67,23 +55,19 @@ export const calculateGenerationYPositions = generations => {
   const positions = {};
 
   generationNumbers.forEach((gen, index) => {
-    positions[gen] = 50 + index * LAYOUT_CONFIG.GENERATION_GAP;
+    positions[gen] = 80 + index * LAYOUT_CONFIG.GENERATION_GAP;
   });
 
   return positions;
 };
 
 /**
- * Posisikan pasangan yang sudah menikah dalam satu generasi
- * @param {Array} pairIds - Array ID pasangan
- * @param {Array} updatedMembers - Array anggota yang diupdate
- * @param {number} currentX - Posisi X saat ini
- * @returns {number} Posisi X yang diupdate
+ * Position married pairs with improved spacing
  */
 const positionMarriedPairs = (pairIds, updatedMembers, currentX) => {
   const pair = pairIds.map(id => updatedMembers.find(m => m.id === id));
 
-  // Pasangan diposisikan berdekatan
+  // Position spouses with proper spacing
   pair[0].x = currentX;
   pair[1].x = currentX + LAYOUT_CONFIG.CARD_WIDTH + LAYOUT_CONFIG.MARRIAGE_GAP;
 
@@ -96,10 +80,7 @@ const positionMarriedPairs = (pairIds, updatedMembers, currentX) => {
 };
 
 /**
- * Posisikan anggota yang tidak menikah dalam satu generasi
- * @param {Object} member - Anggota keluarga
- * @param {number} currentX - Posisi X saat ini
- * @returns {number} Posisi X yang diupdate
+ * Position single member
  */
 const positionSingleMember = (member, currentX) => {
   member.x = currentX;
@@ -107,43 +88,36 @@ const positionSingleMember = (member, currentX) => {
 };
 
 /**
- * Memproses posisi X untuk satu generasi
- * @param {number} genNumber - Nomor generasi
- * @param {Array} updatedMembers - Array anggota yang diupdate
- * @returns {void}
+ * Process X positions for one generation with improved layout
  */
 const processGenerationXPositions = (genNumber, updatedMembers) => {
   const genMembers = updatedMembers.filter(m => m.generation === genNumber);
 
-  // Grup pasangan yang sudah menikah
+  // Group married pairs
   const marriedPairs = findMarriedPairs(genMembers);
   const singleMembers = genMembers.filter(
     m => !marriedPairs.some(pair => pair.includes(m.id))
   );
 
-  let currentX = 100; // Starting X position
+  let currentX = 150; // Improved starting position
 
-  // Posisikan pasangan yang sudah menikah
+  // Position married pairs first
   marriedPairs.forEach(pairIds => {
     currentX = positionMarriedPairs(pairIds, updatedMembers, currentX);
   });
 
-  // Posisikan anggota yang tidak menikah
+  // Position single members
   singleMembers.forEach(member => {
     currentX = positionSingleMember(member, currentX);
   });
 };
 
 /**
- * Mengoptimalkan posisi X untuk menghindari overlap dan mengatur pasangan
- * @param {Array} familyMembers - Array anggota keluarga
- * @param {Object} generations - Object generasi
- * @returns {Array} Array anggota dengan posisi X yang dioptimalkan
+ * Optimize X positions with improved spacing and alignment
  */
 export const optimizeXPositions = (familyMembers, generations) => {
   const updatedMembers = [...familyMembers];
 
-  // Proses setiap generasi dari atas ke bawah
   const sortedGenerations = Object.keys(generations)
     .map(Number)
     .sort((a, b) => a - b);
@@ -156,9 +130,7 @@ export const optimizeXPositions = (familyMembers, generations) => {
 };
 
 /**
- * Mencari pasangan yang sudah menikah dalam satu generasi
- * @param {Array} members - Array anggota dalam satu generasi
- * @returns {Array} Array pasangan yang sudah menikah
+ * Find married pairs in a generation
  */
 export const findMarriedPairs = members => {
   const pairs = [];
@@ -179,10 +151,7 @@ export const findMarriedPairs = members => {
 };
 
 /**
- * Menghitung titik koneksi untuk garis genealogi
- * @param {Object} member - Anggota keluarga
- * @param {String} connectionType - Tipe koneksi ('top', 'bottom', 'center', 'left', 'right')
- * @returns {Object} Koordinat titik koneksi
+ * Get connection point for genealogy lines
  */
 export const getConnectionPoint = (member, connectionType = 'center') => {
   const { x, y } = member;
@@ -204,15 +173,13 @@ export const getConnectionPoint = (member, connectionType = 'center') => {
 };
 
 /**
- * Validasi hubungan keluarga untuk memastikan konsistensi data
- * @param {Array} familyMembers - Array anggota keluarga
- * @returns {Array} Array error jika ada inkonsistensi
+ * Validate family relationships
  */
 export const validateFamilyRelationships = familyMembers => {
   const errors = [];
 
   familyMembers.forEach(member => {
-    // Validasi spouse relationship
+    // Validate spouse relationship
     if (member.spouseId) {
       const spouse = familyMembers.find(m => m.id === member.spouseId);
       if (!spouse) {
@@ -226,7 +193,7 @@ export const validateFamilyRelationships = familyMembers => {
       }
     }
 
-    // Validasi parent-child relationship
+    // Validate parent-child relationship
     if (member.children) {
       member.children.forEach(childId => {
         const child = familyMembers.find(m => m.id === childId);
@@ -242,7 +209,7 @@ export const validateFamilyRelationships = familyMembers => {
       });
     }
 
-    // Validasi parents relationship
+    // Validate parents relationship
     if (member.parents) {
       member.parents.forEach(parentId => {
         const parent = familyMembers.find(m => m.id === parentId);
@@ -263,9 +230,7 @@ export const validateFamilyRelationships = familyMembers => {
 };
 
 /**
- * Menghitung bounding box untuk seluruh family tree
- * @param {Array} familyMembers - Array anggota keluarga
- * @returns {Object} Bounding box dengan minX, minY, maxX, maxY
+ * Calculate tree bounds with improved margins
  */
 export const calculateTreeBounds = familyMembers => {
   if (familyMembers.length === 0) {
@@ -274,10 +239,10 @@ export const calculateTreeBounds = familyMembers => {
 
   const { CARD_WIDTH, CARD_HEIGHT } = LAYOUT_CONFIG;
 
-  const minX = Math.min(...familyMembers.map(m => m.x)) - 50;
-  const maxX = Math.max(...familyMembers.map(m => m.x + CARD_WIDTH)) + 50;
-  const minY = Math.min(...familyMembers.map(m => m.y)) - 50;
-  const maxY = Math.max(...familyMembers.map(m => m.y + CARD_HEIGHT)) + 50;
+  const minX = Math.min(...familyMembers.map(m => m.x)) - 100;
+  const maxX = Math.max(...familyMembers.map(m => m.x + CARD_WIDTH)) + 100;
+  const minY = Math.min(...familyMembers.map(m => m.y)) - 100;
+  const maxY = Math.max(...familyMembers.map(m => m.y + CARD_HEIGHT)) + 100;
 
   return { minX, minY, maxX, maxY };
 };
