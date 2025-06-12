@@ -75,7 +75,9 @@ const Header = () => {
             <div className="relative">
               <button
                 onClick={toggleProfile}
-                className="flex items-center space-x-2 p-2 rounded-md text-text-secondary hover:text-primary hover:bg-surface transition-smooth"
+                aria-label="Open profile menu"
+                aria-expanded={isProfileOpen}
+                className="flex items-center space-x-2 p-2 rounded-md text-text-secondary hover:text-primary hover:bg-surface transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
                   <Icon name="User" size={16} color="white" />
@@ -114,7 +116,9 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="p-2 rounded-md text-text-secondary hover:text-primary hover:bg-surface transition-smooth"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
+              className="p-2 rounded-md text-text-secondary hover:text-primary hover:bg-surface transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             >
               <Icon name={isMenuOpen ? 'X' : 'Menu'} size={24} />
             </button>

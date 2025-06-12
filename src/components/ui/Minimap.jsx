@@ -8,18 +8,18 @@ import PropTypes from 'prop-types';
 import { Stage, Layer, Rect, Group } from 'react-konva';
 import Icon from 'components/AppIcon';
 
-const Minimap = ({ 
-  familyMembers, 
-  minimapData, 
-  onMinimapClick, 
+const Minimap = ({
+  familyMembers,
+  minimapData,
+  onMinimapClick,
   isVisible,
-  className
+  className,
 }) => {
   if (!isVisible || !minimapData) return null;
 
   const { minimapWidth, minimapHeight, minimapScale, viewport } = minimapData;
 
-  const handleStageClick = (e) => {
+  const handleStageClick = e => {
     const pos = e.target.getStage().getPointerPosition();
     if (onMinimapClick) {
       onMinimapClick(pos.x, pos.y, minimapData);
@@ -27,22 +27,36 @@ const Minimap = ({
   };
 
   return (
-    <div className={`absolute bg-background border border-border rounded-lg shadow-lg overflow-hidden ${className}`}>
+    <div
+      className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden ${className}`}
+      style={{
+        position: 'relative',
+        zIndex: 1000,
+        width: 'auto',
+        height: 'auto',
+      }}
+    >
       {/* Header */}
       <div className="px-3 py-2 border-b border-border bg-surface">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-text-primary">Overview</span>
+          <span className="text-xs font-medium text-text-primary">
+            Overview
+          </span>
           <Icon name="Minimize2" size={12} className="text-text-secondary" />
         </div>
       </div>
-      
+
       {/* Minimap Canvas */}
-      <div className="relative">
+      <div className="relative" style={{ overflow: 'hidden' }}>
         <Stage
           width={Math.max(minimapWidth, 150)}
           height={Math.max(minimapHeight, 100)}
           onClick={handleStageClick}
-          style={{ cursor: 'pointer' }}
+          style={{
+            cursor: 'pointer',
+            display: 'block',
+            position: 'relative',
+          }}
         >
           <Layer>
             {/* Background */}
@@ -55,7 +69,7 @@ const Minimap = ({
               stroke="#E5E7EB"
               strokeWidth={0.5}
             />
-            
+
             {/* Family members as small rectangles */}
             {familyMembers.map(member => (
               <Rect
@@ -68,7 +82,7 @@ const Minimap = ({
                 cornerRadius={1}
               />
             ))}
-            
+
             {/* Viewport indicator */}
             <Group>
               <Rect
@@ -85,7 +99,7 @@ const Minimap = ({
           </Layer>
         </Stage>
       </div>
-      
+
       {/* Scale indicator */}
       <div className="px-3 py-1 border-t border-border bg-surface">
         <div className="text-xs text-text-secondary text-center">
@@ -126,7 +140,7 @@ Minimap.defaultProps = {
   familyMembers: [],
   onMinimapClick: undefined,
   isVisible: true,
-  className: "",
+  className: '',
 };
 
 export default Minimap;

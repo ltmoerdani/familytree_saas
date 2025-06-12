@@ -196,9 +196,13 @@ const LoginForm = ({ onSuccess }) => {
             checked={formData.rememberMe}
             onChange={handleInputChange}
             className="w-4 h-4 text-primary border-border rounded focus:ring-primary-500 focus:ring-2"
+            aria-describedby="remember-me-description"
           />
           <span className="text-sm text-text-secondary">Remember me</span>
         </label>
+        <p id="remember-me-description" className="sr-only">
+          Keep me signed in on this device
+        </p>
 
         <Link
           to="#"
@@ -212,7 +216,8 @@ const LoginForm = ({ onSuccess }) => {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+        className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 focus:outline-none"
+        aria-label={isSubmitting ? 'Signing in...' : 'Sign in to your account'}
       >
         {isSubmitting ? (
           <>

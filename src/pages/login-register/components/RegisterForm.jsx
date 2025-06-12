@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/AppIcon';
 
 const RegisterForm = ({ onSuccess }) => {
@@ -8,24 +9,24 @@ const RegisterForm = ({ onSuccess }) => {
     email: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false
+    acceptTerms: false,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
 
@@ -35,25 +36,31 @@ const RegisterForm = ({ onSuccess }) => {
     }
   };
 
-  const calculatePasswordStrength = (password) => {
+  const calculatePasswordStrength = password => {
     let strength = 0;
     if (password.length >= 8) strength += 1;
     if (/[a-z]/.test(password)) strength += 1;
     if (/[A-Z]/.test(password)) strength += 1;
-    if (/[0-9]/.test(password)) strength += 1;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    if (/\d/.test(password)) strength += 1;
+    if (/[^A-Za-z\d]/.test(password)) strength += 1;
     setPasswordStrength(strength);
   };
 
   const getPasswordStrengthText = () => {
     switch (passwordStrength) {
       case 0:
-      case 1: return { text: 'Very Weak', color: 'text-error-600' };
-      case 2: return { text: 'Weak', color: 'text-warning-600' };
-      case 3: return { text: 'Fair', color: 'text-warning-500' };
-      case 4: return { text: 'Good', color: 'text-success-600' };
-      case 5: return { text: 'Strong', color: 'text-success-700' };
-      default: return { text: '', color: '' };
+      case 1:
+        return { text: 'Very Weak', color: 'text-error-600' };
+      case 2:
+        return { text: 'Weak', color: 'text-warning-600' };
+      case 3:
+        return { text: 'Fair', color: 'text-warning-500' };
+      case 4:
+        return { text: 'Good', color: 'text-success-600' };
+      case 5:
+        return { text: 'Strong', color: 'text-success-700' };
+      default:
+        return { text: '', color: '' };
     }
   };
 
@@ -93,9 +100,9 @@ const RegisterForm = ({ onSuccess }) => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -117,7 +124,10 @@ const RegisterForm = ({ onSuccess }) => {
       {/* Name Fields */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-2">
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-text-primary mb-2"
+          >
             First Name
           </label>
           <input
@@ -127,8 +137,9 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.firstName}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.firstName 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.firstName
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="John"
           />
@@ -141,7 +152,10 @@ const RegisterForm = ({ onSuccess }) => {
         </div>
 
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-text-primary mb-2">
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-text-primary mb-2"
+          >
             Last Name
           </label>
           <input
@@ -151,8 +165,9 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.lastName}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.lastName 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.lastName
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="Doe"
           />
@@ -167,7 +182,10 @@ const RegisterForm = ({ onSuccess }) => {
 
       {/* Email Field */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-text-primary mb-2"
+        >
           Email Address
         </label>
         <div className="relative">
@@ -178,14 +196,15 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.email}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 pl-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.email 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.email
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="john@example.com"
           />
-          <Icon 
-            name="Mail" 
-            size={18} 
+          <Icon
+            name="Mail"
+            size={18}
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
               errors.email ? 'text-error-400' : 'text-text-secondary'
             }`}
@@ -201,7 +220,10 @@ const RegisterForm = ({ onSuccess }) => {
 
       {/* Password Field */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-text-primary mb-2"
+        >
           Password
         </label>
         <div className="relative">
@@ -212,43 +234,51 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.password}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 pl-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.password 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.password
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="Create a strong password"
           />
-          <Icon 
-            name="Lock" 
-            size={18} 
+          <Icon
+            name="Lock"
+            size={18}
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
               errors.password ? 'text-error-400' : 'text-text-secondary'
             }`}
           />
         </div>
-        
+
         {/* Password Strength Indicator */}
         {formData.password && (
           <div className="mt-2">
             <div className="flex space-x-1 mb-1">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <div
-                  key={level}
-                  className={`h-1 flex-1 rounded ${
-                    level <= passwordStrength
-                      ? passwordStrength <= 2
-                        ? 'bg-error-500'
-                        : passwordStrength <= 3
-                        ? 'bg-warning-500' :'bg-success-500' :'bg-gray-200'
-                  }`}
-                ></div>
-              ))}
+              {[1, 2, 3, 4, 5].map(level => {
+                let strengthColor = 'bg-gray-200';
+                if (level <= passwordStrength) {
+                  if (passwordStrength <= 2) {
+                    strengthColor = 'bg-error-500';
+                  } else if (passwordStrength <= 3) {
+                    strengthColor = 'bg-warning-500';
+                  } else {
+                    strengthColor = 'bg-success-500';
+                  }
+                }
+
+                return (
+                  <div
+                    key={level}
+                    className={`h-1 flex-1 rounded ${strengthColor}`}
+                  ></div>
+                );
+              })}
             </div>
             <p className={`text-xs ${strengthIndicator.color}`}>
               Password strength: {strengthIndicator.text}
             </p>
           </div>
         )}
-        
+
         {errors.password && (
           <p className="mt-1 text-sm text-error-600 flex items-center space-x-1">
             <Icon name="AlertCircle" size={14} />
@@ -259,7 +289,10 @@ const RegisterForm = ({ onSuccess }) => {
 
       {/* Confirm Password Field */}
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-2">
+        <label
+          htmlFor="confirmPassword"
+          className="block text-sm font-medium text-text-primary mb-2"
+        >
           Confirm Password
         </label>
         <div className="relative">
@@ -270,14 +303,15 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.confirmPassword}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 pl-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.confirmPassword 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.confirmPassword
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="Confirm your password"
           />
-          <Icon 
-            name="Lock" 
-            size={18} 
+          <Icon
+            name="Lock"
+            size={18}
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
               errors.confirmPassword ? 'text-error-400' : 'text-text-secondary'
             }`}
@@ -305,13 +339,21 @@ const RegisterForm = ({ onSuccess }) => {
           />
           <span className="text-sm text-text-secondary">
             I agree to the{' '}
-            <a href="#" className="text-primary hover:text-primary-600 transition-smooth">
+            <button
+              type="button"
+              className="text-primary hover:text-primary-600 transition-smooth underline"
+              onClick={() => window.open('/terms', '_blank')}
+            >
               Terms of Service
-            </a>{' '}
+            </button>{' '}
             and{' '}
-            <a href="#" className="text-primary hover:text-primary-600 transition-smooth">
+            <button
+              type="button"
+              className="text-primary hover:text-primary-600 transition-smooth underline"
+              onClick={() => window.open('/privacy', '_blank')}
+            >
               Privacy Policy
-            </a>
+            </button>
           </span>
         </label>
         {errors.acceptTerms && (
@@ -326,7 +368,12 @@ const RegisterForm = ({ onSuccess }) => {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+        className="w-full bg-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 focus:outline-none"
+        aria-label={
+          isSubmitting
+            ? 'Creating account...'
+            : 'Create your family tree account'
+        }
       >
         {isSubmitting ? (
           <>
@@ -342,6 +389,11 @@ const RegisterForm = ({ onSuccess }) => {
       </button>
     </form>
   );
+};
+
+// PropTypes validation
+RegisterForm.propTypes = {
+  onSuccess: PropTypes.func.isRequired,
 };
 
 export default RegisterForm;

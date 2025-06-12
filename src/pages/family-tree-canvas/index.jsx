@@ -25,6 +25,11 @@ const FamilyTreeCanvas = () => {
   const [layoutMode, setLayoutMode] = useState('manual');
   const [showMinimap] = useState(true);
 
+  // Grid system state
+  const [showGrid, setShowGrid] = useState(false);
+  const [gridSize, setGridSize] = useState(50); // Grid cell size in pixels
+  const [snapToGrid, setSnapToGrid] = useState(false);
+
   // Initialize with improved layout data matching the reference
   const initialMembers = [
     // Generation 1 - Grandparents
@@ -182,17 +187,37 @@ const FamilyTreeCanvas = () => {
     setIsDragging(member.id);
   };
 
+  // Helper function to snap coordinates to grid
+  const snapToGridHelper = (x, y) => {
+    if (!snapToGrid) return { x, y };
+
+    return {
+      x: Math.round(x / gridSize) * gridSize,
+      y: Math.round(y / gridSize) * gridSize,
+    };
+  };
   const handleDragMove = (member, newPosition) => {
+    // Apply grid snapping if enabled
+    const snappedPosition = snapToGridHelper(newPosition.x, newPosition.y);
+
     const updatedMembers = familyMembers.map(m =>
-      m.id === member.id ? { ...m, x: newPosition.x, y: newPosition.y } : m
+      m.id === member.id
+        ? { ...m, x: snappedPosition.x, y: snappedPosition.y }
+        : m
     );
     updateMembersForDrag(updatedMembers);
   };
 
   const handleDragEnd = (member, newPosition) => {
     setIsDragging(null);
+
+    // Apply grid snapping if enabled
+    const snappedPosition = snapToGridHelper(newPosition.x, newPosition.y);
+
     const updatedMembers = familyMembers.map(m =>
-      m.id === member.id ? { ...m, x: newPosition.x, y: newPosition.y } : m
+      m.id === member.id
+        ? { ...m, x: snappedPosition.x, y: snappedPosition.y }
+        : m
     );
     updateAllMembers(updatedMembers);
   };
@@ -394,18 +419,118 @@ const FamilyTreeCanvas = () => {
               <div className="space-y-2">
                 <button
                   onClick={applyAutoLayout}
-                  className="w-full flex items-center space-x-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-smooth"
+                  className="w-full flex items-center space-x-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary-100 focus:ring-offset-2"
+                  aria-label="Apply automatic layout to family tree"
                 >
                   <Icon name="Shuffle" size={16} />
                   <span>Auto Layout</span>
                 </button>
                 <button
                   onClick={zoomToFit}
-                  className="w-full flex items-center space-x-2 px-3 py-2 bg-surface text-text-primary border border-border rounded-lg hover:bg-secondary-100 transition-smooth"
+                  className="w-full flex items-center space-x-2 px-3 py-2 bg-surface text-text-primary border border-border rounded-lg hover:bg-secondary-100 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  aria-label="Zoom to fit entire family tree"
                 >
                   <Icon name="Maximize2" size={16} />
                   <span>Fit View</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Grid Controls */}
+            <div className="mb-6">
+              <h4 className="font-medium text-text-primary mb-3">
+                Grid System
+              </h4>
+              <div className="space-y-3">
+                {/* Show Grid Toggle */}
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showGrid}
+                      onChange={e => setShowGrid(e.target.checked)}
+                      className="w-4 h-4 text-primary focus:ring-primary border-border rounded focus:ring-2"
+                      aria-describedby="show-grid-description"
+                    />
+                    <span className="text-sm text-text-primary">Show Grid</span>
+                  </label>
+                  <Icon
+                    name="Grid3x3"
+                    size={16}
+                    className={
+                      showGrid ? 'text-primary' : 'text-text-secondary'
+                    }
+                    aria-hidden="true"
+                  />
+                </div>
+                <p id="show-grid-description" className="sr-only">
+                  Toggle visibility of background grid lines
+                </p>
+
+                {/* Snap to Grid Toggle */}
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={snapToGrid}
+                      onChange={e => setSnapToGrid(e.target.checked)}
+                      className="w-4 h-4 text-primary focus:ring-primary border-border rounded focus:ring-2"
+                      aria-describedby="snap-grid-description"
+                    />
+                    <span className="text-sm text-text-primary">
+                      Snap to Grid
+                    </span>
+                  </label>
+                  <Icon
+                    name="Move"
+                    size={16}
+                    className={
+                      snapToGrid ? 'text-primary' : 'text-text-secondary'
+                    }
+                    aria-hidden="true"
+                  />
+                </div>
+                <p id="snap-grid-description" className="sr-only">
+                  Enable automatic snapping of family member cards to grid
+                  positions
+                </p>
+
+                {/* Grid Size Control */}
+                <div className="space-y-2">
+                  <label className="block text-sm text-text-secondary">
+                    Grid Size: {gridSize}px
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setGridSize(Math.max(20, gridSize - 10))}
+                      className="w-8 h-8 bg-surface border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary hover:bg-secondary-100 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                      disabled={gridSize <= 20}
+                      aria-label="Decrease grid size"
+                    >
+                      <Icon name="Minus" size={14} />
+                    </button>
+                    <div
+                      className="flex-1 bg-surface rounded-lg px-3 py-2 text-center text-sm text-text-primary border border-border"
+                      role="status"
+                      aria-live="polite"
+                      aria-label={`Current grid size: ${gridSize} pixels`}
+                    >
+                      {gridSize}px
+                    </div>
+                    <button
+                      onClick={() => setGridSize(Math.min(100, gridSize + 10))}
+                      className="w-8 h-8 bg-surface border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary hover:bg-secondary-100 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                      disabled={gridSize >= 100}
+                      aria-label="Increase grid size"
+                    >
+                      <Icon name="Plus" size={14} />
+                    </button>
+                  </div>
+                  <div className="flex justify-between text-xs text-text-secondary">
+                    <span>Fine</span>
+                    <span>Coarse</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -419,6 +544,7 @@ const FamilyTreeCanvas = () => {
                   name="Search"
                   size={16}
                   className="absolute left-3 top-3 text-text-secondary"
+                  aria-hidden="true"
                 />
                 <input
                   type="text"
@@ -426,6 +552,8 @@ const FamilyTreeCanvas = () => {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary"
+                  aria-label="Search family members by name"
+                  role="searchbox"
                 />
               </div>
             </div>
@@ -435,16 +563,21 @@ const FamilyTreeCanvas = () => {
               <h4 className="font-medium text-text-primary mb-3">
                 Anggota Keluarga ({filteredMembers.length})
               </h4>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <ul
+                className="space-y-2 max-h-64 overflow-y-auto"
+                aria-label="Family members list"
+              >
                 {filteredMembers.map(member => (
                   <button
                     key={member.id}
                     onClick={() => handleMemberSelect(member)}
-                    className={`w-full text-left p-3 rounded-lg border transition-smooth ${
+                    className={`w-full text-left p-3 rounded-lg border transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 ${
                       selectedMember?.id === member.id
                         ? 'border-primary bg-primary-50'
                         : 'border-border hover:border-primary-200 hover:bg-surface'
                     }`}
+                    aria-label={`Select ${member.firstName} ${member.lastName}, Generation ${member.generation}, ${member.occupation}`}
+                    aria-selected={selectedMember?.id === member.id}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
@@ -461,15 +594,23 @@ const FamilyTreeCanvas = () => {
                     </div>
                   </button>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
         </div>
 
         {/* Main Canvas Area */}
-        <div className="flex-1 relative overflow-hidden bg-gray-50">
+        <div
+          className="flex-1 relative overflow-hidden bg-gray-50"
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            isolation: 'isolate',
+          }}
+        >
           {/* Canvas Controls */}
-          <div className="absolute top-4 left-4 z-40 flex items-center space-x-2">
+          <div className="absolute top-4 left-4 z-50 flex items-center space-x-2">
             <button
               onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
               className="w-10 h-10 bg-background border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary transition-smooth shadow-card"
@@ -491,7 +632,7 @@ const FamilyTreeCanvas = () => {
           </div>
 
           {/* Zoom Controls */}
-          <div className="absolute bottom-4 left-4 z-40 bg-background border border-border rounded-lg shadow-card">
+          <div className="absolute bottom-4 left-4 z-50 bg-background border border-border rounded-lg shadow-card">
             <div className="flex flex-col">
               <button
                 onClick={zoomIn}
@@ -513,16 +654,6 @@ const FamilyTreeCanvas = () => {
             </div>
           </div>
 
-          {/* Minimap */}
-          {showMinimap && (
-            <Minimap
-              familyMembers={familyMembers}
-              minimapData={minimapData}
-              onMinimapClick={handleMinimapClick}
-              className="top-4 right-4"
-            />
-          )}
-
           {/* Konva Stage */}
           <Stage
             ref={stageRef}
@@ -536,7 +667,49 @@ const FamilyTreeCanvas = () => {
             onWheel={handleWheel}
             onDragStart={handleStageDragStart}
             onDragEnd={handleStageDragEnd}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 1,
+            }}
           >
+            {/* Layer 1: Background Grid (paling bawah) */}
+            <Layer>
+              {/* Grid lines - Background layer */}
+              {showGrid && (
+                <React.Fragment>
+                  {/* Horizontal grid lines */}
+                  {Array.from(
+                    { length: Math.ceil(2000 / gridSize) + 1 },
+                    (_, i) => (
+                      <Line
+                        key={`h-line-${i}`}
+                        points={[0, i * gridSize, 2000, i * gridSize]}
+                        stroke="#E5E7EB"
+                        strokeWidth={1}
+                        opacity={0.3}
+                      />
+                    )
+                  )}
+                  {/* Vertical grid lines */}
+                  {Array.from(
+                    { length: Math.ceil(2000 / gridSize) + 1 },
+                    (_, i) => (
+                      <Line
+                        key={`v-line-${i}`}
+                        points={[i * gridSize, 0, i * gridSize, 1500]}
+                        stroke="#E5E7EB"
+                        strokeWidth={1}
+                        opacity={0.3}
+                      />
+                    )
+                  )}
+                </React.Fragment>
+              )}
+            </Layer>
+
+            {/* Layer 2: Content (tengah) */}
             <Layer>
               {/* Generation level indicators */}
               {generationLevels.map(gen => (
@@ -577,6 +750,28 @@ const FamilyTreeCanvas = () => {
               ))}
             </Layer>
           </Stage>
+
+          {/* UI Controls Layer (paling atas) */}
+          {/* Minimap - Z-Index paling tinggi */}
+          {showMinimap && (
+            <div
+              className="absolute top-4 right-4 z-50"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                zIndex: 1000,
+                pointerEvents: 'auto',
+              }}
+            >
+              <Minimap
+                familyMembers={familyMembers}
+                minimapData={minimapData}
+                onMinimapClick={handleMinimapClick}
+                isVisible={showMinimap}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right Panel - Member Details (Collapsible) */}

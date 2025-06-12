@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
 
@@ -8,12 +9,12 @@ const MediaTab = ({ memberData, onDataChange }) => {
   const [uploadType, setUploadType] = useState('photo');
   const fileInputRef = useRef(null);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = event => {
     const files = Array.from(event.target.files);
-    
+
     files.forEach(file => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         const newMedia = {
           id: `media-${Date.now()}-${Math.random()}`,
           type: file.type.startsWith('image/') ? 'photo' : 'document',
@@ -22,7 +23,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
           date: new Date().toISOString().split('T')[0],
           description: '',
           fileName: file.name,
-          fileSize: file.size
+          fileSize: file.size,
         };
 
         const updatedMedia = [...memberData.media, newMedia];
@@ -34,20 +35,20 @@ const MediaTab = ({ memberData, onDataChange }) => {
     setShowUploadForm(false);
   };
 
-  const handleRemoveMedia = (mediaId) => {
+  const handleRemoveMedia = mediaId => {
     const updatedMedia = memberData.media.filter(m => m.id !== mediaId);
     onDataChange({ media: updatedMedia });
     setSelectedMedia(null);
   };
 
   const handleUpdateMedia = (mediaId, updates) => {
-    const updatedMedia = memberData.media.map(m => 
+    const updatedMedia = memberData.media.map(m =>
       m.id === mediaId ? { ...m, ...updates } : m
     );
     onDataChange({ media: updatedMedia });
   };
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -80,46 +81,68 @@ const MediaTab = ({ memberData, onDataChange }) => {
           <h4 className="text-md font-heading font-semibold text-text-primary mb-4">
             Upload Media
           </h4>
-          
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                File Type
-              </label>
-              <div className="flex space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    value="photo"
-                    checked={uploadType === 'photo'}
-                    onChange={(e) => setUploadType(e.target.value)}
-                    className="text-primary focus:ring-primary"
-                  />
-                  <span>Photos</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    value="document"
-                    checked={uploadType === 'document'}
-                    onChange={(e) => setUploadType(e.target.value)}
-                    className="text-primary focus:ring-primary"
-                  />
-                  <span>Documents</span>
-                </label>
-              </div>
+              <fieldset>
+                <legend className="block text-sm font-medium text-text-primary mb-2">
+                  File Type
+                </legend>
+                <div className="flex space-x-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      value="photo"
+                      checked={uploadType === 'photo'}
+                      onChange={e => setUploadType(e.target.value)}
+                      className="text-primary focus:ring-primary focus:ring-2"
+                      name="fileType"
+                    />
+                    <span>Photos</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      value="document"
+                      checked={uploadType === 'document'}
+                      onChange={e => setUploadType(e.target.value)}
+                      className="text-primary focus:ring-primary focus:ring-2"
+                      name="fileType"
+                    />
+                    <span>Documents</span>
+                  </label>
+                </div>
+              </fieldset>
             </div>
 
             <div
-              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-primary-50 transition-smooth"
+              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-primary-50 transition-smooth focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2"
               onClick={() => fileInputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
+              aria-label={`Click to upload ${
+                uploadType === 'photo' ? 'photos' : 'documents'
+              } or drag and drop`}
             >
-              <Icon name="Upload" size={48} className="text-text-secondary mx-auto mb-4" />
+              <Icon
+                name="Upload"
+                size={48}
+                className="text-text-secondary mx-auto mb-4"
+                aria-hidden="true"
+              />
               <p className="text-text-primary font-medium mb-2">
                 Click to upload or drag and drop
               </p>
               <p className="text-text-secondary text-sm">
-                {uploadType === 'photo' ? 'PNG, JPG, GIF up to 10MB' : 'PDF, DOC, TXT up to 10MB'}
+                {uploadType === 'photo'
+                  ? 'PNG, JPG, GIF up to 10MB'
+                  : 'PDF, DOC, TXT up to 10MB'}
               </p>
             </div>
 
@@ -127,9 +150,14 @@ const MediaTab = ({ memberData, onDataChange }) => {
               ref={fileInputRef}
               type="file"
               multiple
-              accept={uploadType === 'photo' ? 'image/*' : '.pdf,.doc,.docx,.txt'}
+              accept={
+                uploadType === 'photo' ? 'image/*' : '.pdf,.doc,.docx,.txt'
+              }
               onChange={handleFileUpload}
-              className="hidden"
+              className="sr-only"
+              aria-label={`Upload ${
+                uploadType === 'photo' ? 'photo' : 'document'
+              } files`}
             />
 
             <div className="flex space-x-3">
@@ -140,7 +168,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
                 <Icon name="Upload" size={16} />
                 <span>Choose Files</span>
               </button>
-              
+
               <button
                 onClick={() => setShowUploadForm(false)}
                 className="px-4 py-2 bg-surface text-text-secondary border border-border rounded-lg font-medium hover:bg-secondary-100 transition-smooth"
@@ -163,11 +191,13 @@ const MediaTab = ({ memberData, onDataChange }) => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {photos.map((photo) => (
-              <div
+            {photos.map(photo => (
+              <button
                 key={photo.id}
-                className="relative group cursor-pointer"
+                type="button"
+                className="relative group cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
                 onClick={() => setSelectedMedia(photo)}
+                aria-label={`View photo: ${photo.title}`}
               >
                 <div className="aspect-square rounded-lg overflow-hidden bg-primary-100">
                   <Image
@@ -176,18 +206,24 @@ const MediaTab = ({ memberData, onDataChange }) => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 </div>
-                
+
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 rounded-lg transition-all duration-200 flex items-center justify-center">
-                  <Icon name="Eye" size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <Icon
+                    name="Eye"
+                    size={24}
+                    className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  />
                 </div>
-                
+
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       handleRemoveMedia(photo.id);
                     }}
-                    className="w-8 h-8 bg-error text-white rounded-full flex items-center justify-center hover:bg-error-600 transition-smooth"
+                    className="w-8 h-8 bg-error text-white rounded-full flex items-center justify-center hover:bg-error-600 transition-smooth focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2"
+                    aria-label={`Delete photo: ${photo.title}`}
+                    type="button"
                   >
                     <Icon name="X" size={14} />
                   </button>
@@ -199,7 +235,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
                 <p className="text-xs text-text-secondary">
                   {new Date(photo.date).toLocaleDateString()}
                 </p>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -216,7 +252,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
           </div>
 
           <div className="space-y-3">
-            {documents.map((doc) => (
+            {documents.map(doc => (
               <div
                 key={doc.id}
                 className="flex items-center justify-between p-4 bg-background rounded-lg border border-border hover:bg-surface transition-smooth"
@@ -232,7 +268,9 @@ const MediaTab = ({ memberData, onDataChange }) => {
                       {doc.fileSize && ` • ${formatFileSize(doc.fileSize)}`}
                     </p>
                     {doc.description && (
-                      <p className="text-sm text-text-secondary mt-1">{doc.description}</p>
+                      <p className="text-sm text-text-secondary mt-1">
+                        {doc.description}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -268,12 +306,17 @@ const MediaTab = ({ memberData, onDataChange }) => {
       {/* Empty State */}
       {memberData.media.length === 0 && (
         <div className="bg-surface rounded-lg border border-border p-12 text-center">
-          <Icon name="Image" size={48} className="text-text-secondary mx-auto mb-4" />
+          <Icon
+            name="Image"
+            size={48}
+            className="text-text-secondary mx-auto mb-4"
+          />
           <h4 className="text-lg font-heading font-semibold text-text-primary mb-2">
             No Media Yet
           </h4>
           <p className="text-text-secondary mb-6">
-            Upload photos and documents to preserve family memories and important records.
+            Upload photos and documents to preserve family memories and
+            important records.
           </p>
           <button
             onClick={() => setShowUploadForm(true)}
@@ -300,7 +343,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
                 <Icon name="X" size={20} />
               </button>
             </div>
-            
+
             <div className="p-6">
               {selectedMedia.type === 'photo' ? (
                 <div className="text-center">
@@ -312,48 +355,79 @@ const MediaTab = ({ memberData, onDataChange }) => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Icon name="FileText" size={64} className="text-accent mx-auto mb-4" />
-                  <p className="text-text-primary font-medium mb-2">{selectedMedia.fileName}</p>
+                  <Icon
+                    name="FileText"
+                    size={64}
+                    className="text-accent mx-auto mb-4"
+                  />
+                  <p className="text-text-primary font-medium mb-2">
+                    {selectedMedia.fileName}
+                  </p>
                   <p className="text-text-secondary">
-                    {selectedMedia.fileSize && formatFileSize(selectedMedia.fileSize)}
+                    {selectedMedia.fileSize &&
+                      formatFileSize(selectedMedia.fileSize)}
                   </p>
                 </div>
               )}
-              
+
               <div className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label
+                    htmlFor={`media-title-${selectedMedia.id}`}
+                    className="block text-sm font-medium text-text-primary mb-2"
+                  >
                     Title
                   </label>
                   <input
+                    id={`media-title-${selectedMedia.id}`}
                     type="text"
                     value={selectedMedia.title}
-                    onChange={(e) => handleUpdateMedia(selectedMedia.id, { title: e.target.value })}
+                    onChange={e =>
+                      handleUpdateMedia(selectedMedia.id, {
+                        title: e.target.value,
+                      })
+                    }
                     className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label
+                    htmlFor={`media-description-${selectedMedia.id}`}
+                    className="block text-sm font-medium text-text-primary mb-2"
+                  >
                     Description
                   </label>
                   <textarea
+                    id={`media-description-${selectedMedia.id}`}
                     value={selectedMedia.description}
-                    onChange={(e) => handleUpdateMedia(selectedMedia.id, { description: e.target.value })}
+                    onChange={e =>
+                      handleUpdateMedia(selectedMedia.id, {
+                        description: e.target.value,
+                      })
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                     placeholder="Add a description..."
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label
+                    htmlFor={`media-date-${selectedMedia.id}`}
+                    className="block text-sm font-medium text-text-primary mb-2"
+                  >
                     Date
                   </label>
                   <input
+                    id={`media-date-${selectedMedia.id}`}
                     type="date"
                     value={selectedMedia.date}
-                    onChange={(e) => handleUpdateMedia(selectedMedia.id, { date: e.target.value })}
+                    onChange={e =>
+                      handleUpdateMedia(selectedMedia.id, {
+                        date: e.target.value,
+                      })
+                    }
                     className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                   />
                 </div>
@@ -364,6 +438,25 @@ const MediaTab = ({ memberData, onDataChange }) => {
       )}
     </div>
   );
+};
+
+// PropTypes validation
+MediaTab.propTypes = {
+  memberData: PropTypes.shape({
+    media: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        type: PropTypes.oneOf(['photo', 'document']).isRequired,
+        title: PropTypes.string.isRequired,
+        url: PropTypes.string,
+        fileName: PropTypes.string,
+        fileSize: PropTypes.number,
+        date: PropTypes.string,
+        description: PropTypes.string,
+      })
+    ).isRequired,
+  }).isRequired,
+  onDataChange: PropTypes.func.isRequired,
 };
 
 export default MediaTab;

@@ -1,10 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Group, Rect, Text, Circle } from 'react-konva';
+import { Group, Rect, Text, Circle, Image } from 'react-konva';
 
-/**
- * Enhanced family member card matching the reference design
- */
 const FamilyMemberCard = ({
   member,
   isSelected = false,
@@ -15,67 +12,67 @@ const FamilyMemberCard = ({
   onDragEnd,
   onDoubleClick,
 }) => {
-  // Enhanced card dimensions for better layout
-  const cardWidth = 160;
-  const cardHeight = 180;
+  const [profileImage, setProfileImage] = useState(null);
 
-  // Color theme based on gender
-  const getCardTheme = () => {
-    if (member.gender === 'male') {
-      return {
-        primary: '#3B82F6',
-        secondary: '#DBEAFE',
-        border: '#2563EB',
-        accent: '#1D4ED8',
+  // Card dimensions matching the design
+  const cardWidth = 180;
+  const cardHeight = 200;
+
+  // Photo dimensions
+  const photoSize = 80;
+  const photoX = (cardWidth - photoSize) / 2;
+  const photoY = 30;
+
+  // Load profile image
+  useEffect(() => {
+    if (member.photo) {
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        setProfileImage(img);
       };
-    } else if (member.gender === 'female') {
-      return {
-        primary: '#EC4899',
-        secondary: '#FCE7F3',
-        border: '#DB2777',
-        accent: '#BE185D',
+      img.onerror = () => {
+        setProfileImage(null);
       };
+      img.src = member.photo;
+    } else {
+      setProfileImage(null);
     }
+  }, [member.photo]);
 
-    return {
-      primary: '#8B4513',
-      secondary: '#F5F5DC',
-      border: '#D2B48C',
-      accent: '#A0522D',
-    };
-  };
-
-  const theme = getCardTheme();
-
-  // Format date
+  // Utility functions
   const formatDate = dateString => {
     if (!dateString) return '';
     return new Date(dateString).getFullYear().toString();
   };
 
+  const calculateAge = birthDate => {
+    if (!birthDate) return '';
+    const age = new Date().getFullYear() - new Date(birthDate).getFullYear();
+    return `${age} years old`;
+  };
+
+  const getBirthYearAndAge = () => {
+    if (!member.birthDate) return '';
+    const year = formatDate(member.birthDate);
+    const age = calculateAge(member.birthDate);
+    return `(${year}) ${age}`;
+  };
+
+  const getDisplayNickname = () => {
+    return member.nickname ? `(${member.nickname})` : '';
+  };
+
+  const getDisplayName = () => {
+    const firstName = member.firstName || '';
+    const lastName = member.lastName || '';
+    return `${firstName} ${lastName}`.trim() || 'Unknown';
+  };
+
   // Status
   const isDeceased = Boolean(member.deathDate);
 
-  // Utility function to get age or death text
-  const getAgeOrDeathText = () => {
-    if (isDeceased) {
-      return `† ${formatDate(member.deathDate)}`;
-    }
-
-    if (member.birthDate) {
-      const age =
-        new Date().getFullYear() - new Date(member.birthDate).getFullYear();
-      return `${age} tahun`;
-    }
-
-    return '';
-  };
-
-  // Name with proper truncation
-  const displayName = member.firstName || 'Unknown';
-  const displayLastName = member.lastName || '';
-
-  // Calculate scale values
+  // Calculate scale values for interaction
   let scaleX = 1;
   let scaleY = 1;
 
@@ -103,201 +100,157 @@ const FamilyMemberCard = ({
       scaleX={scaleX}
       scaleY={scaleY}
     >
-      {/* Card Shadow */}
-      <Rect
-        x={3}
-        y={3}
-        width={cardWidth}
-        height={cardHeight}
-        fill="rgba(0,0,0,0.1)"
-        cornerRadius={12}
-      />
-
-      {/* Card Background */}
+      {/* Card Background - No shadow, clean design */}
       <Rect
         width={cardWidth}
         height={cardHeight}
         fill="white"
-        stroke={isSelected ? theme.border : '#E5E7EB'}
-        strokeWidth={isSelected ? 3 : 1}
-        cornerRadius={12}
+        stroke={isSelected ? '#10B981' : '#E5E7EB'}
+        strokeWidth={isSelected ? 2 : 1}
+        cornerRadius={16}
       />
 
-      {/* Generation indicator */}
-      <Circle x={cardWidth - 15} y={15} radius={8} fill={theme.primary} />
+      {/* Generation number in top-left corner */}
+      <Circle
+        x={20}
+        y={20}
+        radius={12}
+        fill="#10B981"
+        stroke="white"
+        strokeWidth={2}
+      />
       <Text
-        x={cardWidth - 20}
-        y={10}
-        text={member.generation.toString()}
-        fontSize={10}
+        x={20}
+        y={20}
+        text={member.generation?.toString() || '1'}
+        fontSize={12}
         fontFamily="Inter, Arial, sans-serif"
         fontStyle="bold"
         fill="white"
         align="center"
-        width={10}
+        verticalAlign="middle"
+        width={24}
+        height={24}
+        offsetX={12}
+        offsetY={12}
       />
 
-      {/* Photo area */}
+      {/* Photo Container */}
       <Circle
-        x={cardWidth / 2}
-        y={50}
-        radius={25}
-        fill={theme.secondary}
-        stroke={theme.primary}
-        strokeWidth={2}
+        x={photoX + photoSize / 2}
+        y={photoY + photoSize / 2}
+        radius={photoSize / 2}
+        fill="#A7F3D0"
+        stroke="white"
+        strokeWidth={3}
       />
 
-      {/* Gender/Status indicator inside photo */}
-      <Circle
-        x={cardWidth / 2}
-        y={50}
-        radius={18}
-        fill={isDeceased ? '#9E9E9E' : theme.primary}
-        opacity={0.8}
-      />
+      {/* Photo or Placeholder */}
+      {profileImage ? (
+        <Group
+          clipFunc={ctx => {
+            ctx.arc(
+              photoX + photoSize / 2,
+              photoY + photoSize / 2,
+              photoSize / 2 - 5,
+              0,
+              Math.PI * 2,
+              false
+            );
+          }}
+        >
+          <Image
+            x={photoX + 5}
+            y={photoY + 5}
+            width={photoSize - 10}
+            height={photoSize - 10}
+            image={profileImage}
+          />
+        </Group>
+      ) : (
+        <>
+          {/* Photo Placeholder */}
+          <Circle
+            x={photoX + photoSize / 2}
+            y={photoY + photoSize / 2}
+            radius={photoSize / 2 - 5}
+            fill="#F3F4F6"
+          />
 
-      {/* Initial or icon */}
+          {/* Initial Letter in Photo */}
+          <Text
+            x={photoX + photoSize / 2}
+            y={photoY + photoSize / 2}
+            text={getDisplayName().charAt(0).toUpperCase()}
+            fontSize={28}
+            fontFamily="Inter, Arial, sans-serif"
+            fontStyle="bold"
+            fill="#6B7280"
+            align="center"
+            verticalAlign="middle"
+            width={photoSize - 10}
+            height={photoSize - 10}
+            offsetX={(photoSize - 10) / 2}
+            offsetY={(photoSize - 10) / 2}
+          />
+        </>
+      )}
+
+      {/* Nickname */}
+      {getDisplayNickname() && (
+        <Text
+          x={10}
+          y={photoY + photoSize + 15}
+          text={getDisplayNickname()}
+          fontSize={14}
+          fontFamily="Inter, Arial, sans-serif"
+          fontStyle="normal"
+          fill="#F59E0B"
+          align="center"
+          width={cardWidth - 20}
+        />
+      )}
+
+      {/* Full Name - Allow 2 lines for long names */}
       <Text
-        x={cardWidth / 2 - 8}
-        y={44}
-        text={displayName ? displayName.charAt(0).toUpperCase() : '?'}
+        x={10}
+        y={photoY + photoSize + (getDisplayNickname() ? 35 : 20)}
+        text={getDisplayName()}
         fontSize={16}
         fontFamily="Inter, Arial, sans-serif"
         fontStyle="bold"
-        fill="white"
-      />
-
-      {/* Name */}
-      <Text
-        x={10}
-        y={85}
-        width={cardWidth - 20}
-        text={displayName}
-        fontSize={14}
-        fontFamily="Inter, Arial, sans-serif"
-        fontStyle="bold"
-        fill="#2C1810"
+        fill="#1F2937"
         align="center"
-        wrap="none"
+        width={cardWidth - 20}
+        wrap="word"
+        lineHeight={1.2}
       />
 
-      {/* Last name if exists */}
-      {displayLastName && (
+      {/* Birth Year & Age - Style matching reference */}
+      {getBirthYearAndAge() && (
         <Text
           x={10}
-          y={105}
+          y={photoY + photoSize + (getDisplayNickname() ? 65 : 50)}
+          text={getBirthYearAndAge()}
+          fontSize={13}
+          fontFamily="Inter, Arial, sans-serif"
+          fill="#9CA3AF"
+          align="center"
           width={cardWidth - 20}
-          text={displayLastName}
+        />
+      )}
+
+      {/* Death indicator if deceased */}
+      {isDeceased && (
+        <Text
+          x={10}
+          y={photoY + photoSize + (getDisplayNickname() ? 105 : 85)}
+          text={`† ${formatDate(member.deathDate)}`}
           fontSize={12}
           fontFamily="Inter, Arial, sans-serif"
-          fill="#6B4E3D"
+          fill="#EF4444"
           align="center"
-          wrap="none"
-        />
-      )}
-
-      {/* Birth year */}
-      <Text
-        x={10}
-        y={125}
-        width={cardWidth - 20}
-        text={member.birthDate ? `(${formatDate(member.birthDate)})` : ''}
-        fontSize={11}
-        fontFamily="Inter, Arial, sans-serif"
-        fill="#6B4E3D"
-        align="center"
-      />
-
-      {/* Age or death year */}
-      <Text
-        x={10}
-        y={140}
-        width={cardWidth - 20}
-        text={getAgeOrDeathText()}
-        fontSize={10}
-        fontFamily="Inter, Arial, sans-serif"
-        fill={isDeceased ? '#9E9E9E' : '#6B4E3D'}
-        align="center"
-      />
-
-      {/* Occupation */}
-      {member.occupation && (
-        <Text
-          x={10}
-          y={155}
           width={cardWidth - 20}
-          text={member.occupation}
-          fontSize={9}
-          fontFamily="Inter, Arial, sans-serif"
-          fill="#9E9E9E"
-          align="center"
-          wrap="none"
-        />
-      )}
-
-      {/* Location indicator */}
-      {member.location && (
-        <Text
-          x={10}
-          y={cardHeight - 15}
-          width={cardWidth - 20}
-          text={`📍 ${member.location}`}
-          fontSize={8}
-          fontFamily="Inter, Arial, sans-serif"
-          fill="#9E9E9E"
-          align="center"
-        />
-      )}
-
-      {/* Relationship indicators */}
-      {member.spouseId && (
-        <Circle
-          x={15}
-          y={cardHeight - 20}
-          radius={4}
-          fill="#E91E63"
-          stroke="white"
-          strokeWidth={1}
-        />
-      )}
-
-      {member.children && member.children.length > 0 && (
-        <Circle
-          x={cardWidth - 15}
-          y={cardHeight - 20}
-          radius={6}
-          fill="#4CAF50"
-          stroke="white"
-          strokeWidth={1}
-        />
-      )}
-
-      {member.children && member.children.length > 0 && (
-        <Text
-          x={cardWidth - 20}
-          y={cardHeight - 25}
-          text={member.children.length.toString()}
-          fontSize={8}
-          fontFamily="Inter, Arial, sans-serif"
-          fill="white"
-          fontStyle="bold"
-          align="center"
-          width={10}
-        />
-      )}
-
-      {/* Selection highlight */}
-      {isSelected && (
-        <Rect
-          x={-3}
-          y={-3}
-          width={cardWidth + 6}
-          height={cardHeight + 6}
-          stroke={theme.border}
-          strokeWidth={3}
-          cornerRadius={15}
-          fill="transparent"
-          dash={[8, 4]}
         />
       )}
     </Group>
@@ -309,16 +262,14 @@ FamilyMemberCard.propTypes = {
     id: PropTypes.string.isRequired,
     firstName: PropTypes.string,
     lastName: PropTypes.string,
+    nickname: PropTypes.string,
     birthDate: PropTypes.string,
     deathDate: PropTypes.string,
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-    generation: PropTypes.number.isRequired,
+    generation: PropTypes.number,
     gender: PropTypes.oneOf(['male', 'female']),
-    spouseId: PropTypes.string,
-    children: PropTypes.arrayOf(PropTypes.string),
-    occupation: PropTypes.string,
-    location: PropTypes.string,
+    photo: PropTypes.string,
+    x: PropTypes.number,
+    y: PropTypes.number,
   }).isRequired,
   isSelected: PropTypes.bool,
   isDragging: PropTypes.bool,
