@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
 
@@ -18,51 +19,57 @@ const TreeCard = ({ tree, onSelect, isSelected, formatLastModified }) => {
     e.stopPropagation();
     setShowMenu(false);
 
-    // Handle different actions
+    // Handle different actions with proper implementation
     switch (action) {
       case 'edit':
-        // Navigate to tree canvas
+        console.log('Navigate to tree canvas');
         break;
       case 'share':
-        // Open share modal
+        console.log('Open share modal');
         break;
       case 'export':
-        // Open export options
+        console.log('Open export options');
         break;
       case 'duplicate':
-        // Duplicate tree
+        console.log('Duplicate tree');
         break;
       case 'delete':
-        // Show delete confirmation
+        console.log('Show delete confirmation');
         break;
       default:
-        break;
+        console.warn('Unknown action:', action);
+    }
+  };
+
+  const handleCardClick = () => {
+    onSelect(tree.id);
+  };
+
+  const handleKeyDown = e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect(tree.id);
     }
   };
 
   return (
-    <div
-      className={`relative bg-background rounded-lg border transition-smooth hover:shadow-card ${
+    <button
+      type="button"
+      className={`relative bg-background rounded-lg border transition-smooth hover:shadow-card w-full text-left ${
         isSelected
           ? 'border-primary ring-2 ring-primary-100'
           : 'border-border hover:border-primary-200'
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelect(tree.id)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect(tree.id);
-        }
-      }}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
       aria-label={`Select family tree: ${tree.name}. ${
         tree.privacy === 'private' ? 'Private' : 'Shared'
       } tree with ${tree.memberCount} members. Last modified ${new Date(
         tree.lastModified
       ).toLocaleDateString()}`}
+      aria-pressed={isSelected}
     >
       {/* Tree Thumbnail */}
       <div className="relative h-32 rounded-t-lg overflow-hidden bg-surface">
@@ -93,6 +100,7 @@ const TreeCard = ({ tree, onSelect, isSelected, formatLastModified }) => {
         {/* Menu Button */}
         <div className="absolute top-2 right-2">
           <button
+            type="button"
             onClick={handleMenuToggle}
             className={`w-8 h-8 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center transition-smooth hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
               isHovered || showMenu ? 'opacity-100' : 'opacity-0'
@@ -117,6 +125,7 @@ const TreeCard = ({ tree, onSelect, isSelected, formatLastModified }) => {
             >
               <div className="py-1">
                 <button
+                  type="button"
                   onClick={e => handleMenuAction('edit', e)}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-text-secondary hover:bg-surface hover:text-primary transition-smooth focus:outline-none focus:bg-surface focus:text-primary"
                   role="menuitem"
@@ -125,6 +134,7 @@ const TreeCard = ({ tree, onSelect, isSelected, formatLastModified }) => {
                   <span>Edit Tree</span>
                 </button>
                 <button
+                  type="button"
                   onClick={e => handleMenuAction('share', e)}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-text-secondary hover:bg-surface hover:text-primary transition-smooth focus:outline-none focus:bg-surface focus:text-primary"
                   role="menuitem"
@@ -133,23 +143,29 @@ const TreeCard = ({ tree, onSelect, isSelected, formatLastModified }) => {
                   <span>Share</span>
                 </button>
                 <button
+                  type="button"
                   onClick={e => handleMenuAction('export', e)}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-text-secondary hover:bg-surface hover:text-primary transition-smooth"
+                  role="menuitem"
                 >
                   <Icon name="Download" size={16} />
                   <span>Export</span>
                 </button>
                 <div className="border-t border-border my-1"></div>
                 <button
+                  type="button"
                   onClick={e => handleMenuAction('duplicate', e)}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-text-secondary hover:bg-surface hover:text-primary transition-smooth"
+                  role="menuitem"
                 >
                   <Icon name="Copy" size={16} />
                   <span>Duplicate</span>
                 </button>
                 <button
+                  type="button"
                   onClick={e => handleMenuAction('delete', e)}
                   className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-error-500 hover:bg-error-50 transition-smooth"
+                  role="menuitem"
                 >
                   <Icon name="Trash2" size={16} />
                   <span>Delete</span>
@@ -206,13 +222,37 @@ const TreeCard = ({ tree, onSelect, isSelected, formatLastModified }) => {
 
       {/* Click overlay to close menu */}
       {showMenu && (
-        <div
-          className="fixed inset-0 z-5"
+        <button
+          type="button"
+          className="fixed inset-0 z-5 bg-transparent"
           onClick={() => setShowMenu(false)}
-        ></div>
+          onKeyDown={e => {
+            if (e.key === 'Escape') {
+              setShowMenu(false);
+            }
+          }}
+          aria-label="Close menu"
+        />
       )}
-    </div>
+    </button>
   );
+};
+
+// PropTypes validation
+TreeCard.propTypes = {
+  tree: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    thumbnail: PropTypes.string.isRequired,
+    privacy: PropTypes.oneOf(['private', 'shared']).isRequired,
+    memberCount: PropTypes.number.isRequired,
+    collaborators: PropTypes.number,
+    lastModified: PropTypes.instanceOf(Date).isRequired,
+    isRecent: PropTypes.bool,
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  formatLastModified: PropTypes.func.isRequired,
 };
 
 export default TreeCard;

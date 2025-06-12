@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
 
@@ -10,12 +11,12 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
     onDataChange({ [field]: value });
   };
 
-  const handlePhotoUpload = (event) => {
+  const handlePhotoUpload = event => {
     const file = event.target.files[0];
     if (file) {
       // In a real app, you'd upload to a server
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         onDataChange({ profilePhoto: e.target.result });
         setIsEditingPhoto(false);
       };
@@ -23,13 +24,13 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -42,7 +43,7 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
           <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
             Profile Photo
           </h3>
-          
+
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <div className="w-32 h-32 rounded-full overflow-hidden bg-primary-100 border-4 border-background shadow-card">
@@ -52,7 +53,7 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              
+
               <button
                 onClick={() => setIsEditingPhoto(true)}
                 className="absolute bottom-0 right-0 w-10 h-10 bg-primary text-white rounded-full shadow-card flex items-center justify-center hover:bg-primary-600 transition-smooth"
@@ -71,7 +72,7 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
-                
+
                 <div className="flex space-x-2">
                   <button
                     onClick={() => fileInputRef.current?.click()}
@@ -80,7 +81,7 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
                     <Icon name="Upload" size={16} />
                     <span>Upload New</span>
                   </button>
-                  
+
                   <button
                     onClick={() => setIsEditingPhoto(false)}
                     className="px-4 py-2 bg-surface text-text-secondary border border-border rounded-lg font-medium hover:bg-secondary-100 transition-smooth"
@@ -98,30 +99,38 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
           <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
             Personal Information
           </h3>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-text-primary mb-2"
+                >
                   First Name *
                 </label>
                 <input
+                  id="firstName"
                   type="text"
                   value={memberData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  onChange={e => handleInputChange('firstName', e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                   placeholder="Enter first name"
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-text-primary mb-2"
+                >
                   Last Name *
                 </label>
                 <input
+                  id="lastName"
                   type="text"
                   value={memberData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  onChange={e => handleInputChange('lastName', e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                   placeholder="Enter last name"
                 />
@@ -129,25 +138,33 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="middleName"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Middle Name
               </label>
               <input
+                id="middleName"
                 type="text"
                 value={memberData.middleName}
-                onChange={(e) => handleInputChange('middleName', e.target.value)}
+                onChange={e => handleInputChange('middleName', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                 placeholder="Enter middle name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="gender"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Gender
               </label>
               <select
+                id="gender"
                 value={memberData.gender}
-                onChange={(e) => handleInputChange('gender', e.target.value)}
+                onChange={e => handleInputChange('gender', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
               >
                 <option value="">Select gender</option>
@@ -158,13 +175,17 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="occupation"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Occupation
               </label>
               <input
+                id="occupation"
                 type="text"
                 value={memberData.occupation}
-                onChange={(e) => handleInputChange('occupation', e.target.value)}
+                onChange={e => handleInputChange('occupation', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                 placeholder="Enter occupation"
               />
@@ -180,16 +201,20 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
           <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
             Birth & Death Information
           </h3>
-          
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="birthDate"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Birth Date
               </label>
               <input
+                id="birthDate"
                 type="date"
                 value={memberData.birthDate}
-                onChange={(e) => handleInputChange('birthDate', e.target.value)}
+                onChange={e => handleInputChange('birthDate', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
               />
               {memberData.birthDate && (
@@ -200,26 +225,34 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="birthPlace"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Birth Place
               </label>
               <input
+                id="birthPlace"
                 type="text"
                 value={memberData.birthPlace}
-                onChange={(e) => handleInputChange('birthPlace', e.target.value)}
+                onChange={e => handleInputChange('birthPlace', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                 placeholder="Enter birth place"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="deathDate"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Death Date
               </label>
               <input
+                id="deathDate"
                 type="date"
                 value={memberData.deathDate}
-                onChange={(e) => handleInputChange('deathDate', e.target.value)}
+                onChange={e => handleInputChange('deathDate', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
               />
               {memberData.deathDate && (
@@ -230,13 +263,17 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="deathPlace"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Death Place
               </label>
               <input
+                id="deathPlace"
                 type="text"
                 value={memberData.deathPlace}
-                onChange={(e) => handleInputChange('deathPlace', e.target.value)}
+                onChange={e => handleInputChange('deathPlace', e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth"
                 placeholder="Enter death place"
               />
@@ -249,11 +286,15 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
           <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
             Biography
           </h3>
-          
+
           <div>
+            <label htmlFor="biography" className="sr-only">
+              Biography
+            </label>
             <textarea
+              id="biography"
               value={memberData.biography}
-              onChange={(e) => handleInputChange('biography', e.target.value)}
+              onChange={e => handleInputChange('biography', e.target.value)}
               rows={12}
               className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth resize-vertical"
               placeholder="Write a biography for this family member..."
@@ -266,6 +307,24 @@ const BasicInfoTab = ({ memberData, onDataChange }) => {
       </div>
     </div>
   );
+};
+
+// PropTypes validation
+BasicInfoTab.propTypes = {
+  memberData: PropTypes.shape({
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    middleName: PropTypes.string,
+    profilePhoto: PropTypes.string,
+    birthDate: PropTypes.string,
+    deathDate: PropTypes.string,
+    birthPlace: PropTypes.string,
+    deathPlace: PropTypes.string,
+    gender: PropTypes.oneOf(['male', 'female', 'other', '']),
+    occupation: PropTypes.string,
+    biography: PropTypes.string.isRequired,
+  }).isRequired,
+  onDataChange: PropTypes.func.isRequired,
 };
 
 export default BasicInfoTab;

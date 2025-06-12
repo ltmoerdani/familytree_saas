@@ -115,11 +115,9 @@ const MediaTab = ({ memberData, onDataChange }) => {
               </fieldset>
             </div>
 
-            <div
-              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-primary-50 transition-smooth focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2"
+            <button
+              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary hover:bg-primary-50 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 w-full"
               onClick={() => fileInputRef.current?.click()}
-              role="button"
-              tabIndex={0}
               onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
@@ -129,6 +127,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
               aria-label={`Click to upload ${
                 uploadType === 'photo' ? 'photos' : 'documents'
               } or drag and drop`}
+              type="button"
             >
               <Icon
                 name="Upload"
@@ -144,7 +143,7 @@ const MediaTab = ({ memberData, onDataChange }) => {
                   ? 'PNG, JPG, GIF up to 10MB'
                   : 'PDF, DOC, TXT up to 10MB'}
               </p>
-            </div>
+            </button>
 
             <input
               ref={fileInputRef}

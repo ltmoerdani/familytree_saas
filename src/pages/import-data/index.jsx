@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from 'components/ui/Header';
 import TreeContextIndicator from 'components/ui/TreeContextIndicator';
@@ -13,7 +13,6 @@ import ImportSummary from './components/ImportSummary';
 const ImportData = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [parsedData, setParsedData] = useState([]);
   const [columnMapping, setColumnMapping] = useState({});
   const [validationResults, setValidationResults] = useState([]);
@@ -25,74 +24,73 @@ const ImportData = () => {
   // Mock active tree for context indicator
   const activeTree = {
     id: 1,
-    name: "Johnson Family Tree",
+    name: 'Johnson Family Tree',
     memberCount: 24,
-    lastModified: new Date()
+    lastModified: new Date(),
   };
 
   // Mock CSV data structure
   const mockParsedData = [
     {
-      "First Name": "John",
-      "Last Name": "Johnson",
-      "Birth Date": "1950-03-15",
-      "Death Date": "",
-      "Gender": "Male",
-      "Relationship": "Father",
-      "Spouse": "Mary Johnson",
-      "Notes": "Family patriarch, served in military"
+      'First Name': 'John',
+      'Last Name': 'Johnson',
+      'Birth Date': '1950-03-15',
+      'Death Date': '',
+      Gender: 'Male',
+      Relationship: 'Father',
+      Spouse: 'Mary Johnson',
+      Notes: 'Family patriarch, served in military',
     },
     {
-      "First Name": "Mary",
-      "Last Name": "Johnson",
-      "Birth Date": "1952-07-22",
-      "Death Date": "",
-      "Gender": "Female",
-      "Relationship": "Mother",
-      "Spouse": "John Johnson",
-      "Notes": "Teacher for 30 years"
+      'First Name': 'Mary',
+      'Last Name': 'Johnson',
+      'Birth Date': '1952-07-22',
+      'Death Date': '',
+      Gender: 'Female',
+      Relationship: 'Mother',
+      Spouse: 'John Johnson',
+      Notes: 'Teacher for 30 years',
     },
     {
-      "First Name": "Michael",
-      "Last Name": "Johnson",
-      "Birth Date": "1975-11-08",
-      "Death Date": "",
-      "Gender": "Male",
-      "Relationship": "Son",
-      "Spouse": "Sarah Johnson",
-      "Notes": "Software engineer, lives in California"
+      'First Name': 'Michael',
+      'Last Name': 'Johnson',
+      'Birth Date': '1975-11-08',
+      'Death Date': '',
+      Gender: 'Male',
+      Relationship: 'Son',
+      Spouse: 'Sarah Johnson',
+      Notes: 'Software engineer, lives in California',
     },
     {
-      "First Name": "Sarah",
-      "Last Name": "Johnson",
-      "Birth Date": "1978-04-12",
-      "Death Date": "",
-      "Gender": "Female",
-      "Relationship": "Daughter-in-law",
-      "Spouse": "Michael Johnson",
-      "Notes": "Graphic designer"
+      'First Name': 'Sarah',
+      'Last Name': 'Johnson',
+      'Birth Date': '1978-04-12',
+      'Death Date': '',
+      Gender: 'Female',
+      Relationship: 'Daughter-in-law',
+      Spouse: 'Michael Johnson',
+      Notes: 'Graphic designer',
     },
     {
-      "First Name": "Emma",
-      "Last Name": "Johnson",
-      "Birth Date": "2005-09-18",
-      "Death Date": "",
-      "Gender": "Female",
-      "Relationship": "Granddaughter",
-      "Spouse": "",
-      "Notes": "High school student, loves art"
-    }
+      'First Name': 'Emma',
+      'Last Name': 'Johnson',
+      'Birth Date': '2005-09-18',
+      'Death Date': '',
+      Gender: 'Female',
+      Relationship: 'Granddaughter',
+      Spouse: '',
+      Notes: 'High school student, loves art',
+    },
   ];
 
   const steps = [
     { id: 1, title: 'Upload File', icon: 'Upload' },
     { id: 2, title: 'Map Columns', icon: 'ArrowRightLeft' },
     { id: 3, title: 'Validate Data', icon: 'CheckCircle' },
-    { id: 4, title: 'Import', icon: 'Download' }
+    { id: 4, title: 'Import', icon: 'Download' },
   ];
 
-  const handleFileUpload = (file) => {
-    setUploadedFile(file);
+  const handleFileUpload = file => {
     // Simulate file parsing
     setTimeout(() => {
       setParsedData(mockParsedData);
@@ -100,7 +98,7 @@ const ImportData = () => {
     }, 1000);
   };
 
-  const handleColumnMapping = (mapping) => {
+  const handleColumnMapping = mapping => {
     setColumnMapping(mapping);
     // Simulate validation
     const mockValidation = [
@@ -108,20 +106,20 @@ const ImportData = () => {
         type: 'error',
         message: 'Missing required field: Birth Date for John Johnson',
         row: 1,
-        field: 'birthDate'
+        field: 'birthDate',
       },
       {
         type: 'warning',
         message: 'Date format inconsistency detected in row 3',
         row: 3,
-        field: 'birthDate'
+        field: 'birthDate',
       },
       {
         type: 'info',
         message: 'Duplicate name detected: Michael Johnson (rows 3, 7)',
         row: 3,
-        field: 'name'
-      }
+        field: 'name',
+      },
     ];
     setValidationResults(mockValidation);
     setCurrentStep(3);
@@ -130,13 +128,13 @@ const ImportData = () => {
   const handleStartImport = () => {
     setCurrentStep(4);
     setIsImporting(true);
-    
+
     // Simulate import progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += 20;
       setImportProgress(progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
         setIsImporting(false);
@@ -147,7 +145,7 @@ const ImportData = () => {
           skippedRecords: 1,
           errors: 0,
           newMembers: 3,
-          updatedMembers: 1
+          updatedMembers: 1,
         });
       }
     }, 800);
@@ -155,7 +153,6 @@ const ImportData = () => {
 
   const handleReset = () => {
     setCurrentStep(1);
-    setUploadedFile(null);
     setParsedData([]);
     setColumnMapping({});
     setValidationResults([]);
@@ -173,15 +170,15 @@ const ImportData = () => {
         return (
           <div className="space-y-6">
             <DataPreviewTable data={parsedData} />
-            <ColumnMappingInterface 
-              data={parsedData} 
+            <ColumnMappingInterface
+              data={parsedData}
               onMappingComplete={handleColumnMapping}
             />
           </div>
         );
       case 3:
         return (
-          <ValidationResults 
+          <ValidationResults
             results={validationResults}
             data={parsedData}
             mapping={columnMapping}
@@ -190,7 +187,7 @@ const ImportData = () => {
         );
       case 4:
         return importComplete ? (
-          <ImportSummary 
+          <ImportSummary
             summary={importSummary}
             onViewTree={() => navigate('/family-tree-canvas')}
             onImportMore={handleReset}
@@ -207,7 +204,7 @@ const ImportData = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <TreeContextIndicator activeTree={activeTree} />
-      
+
       <main className="pt-28 pb-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
@@ -221,7 +218,7 @@ const ImportData = () => {
                   Upload and import family information from CSV or Excel files
                 </p>
               </div>
-              
+
               <button
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center space-x-2 px-4 py-2 text-text-secondary hover:text-primary hover:bg-surface rounded-lg transition-smooth"
@@ -235,13 +232,20 @@ const ImportData = () => {
             <div className="flex items-center justify-between bg-surface rounded-lg p-4">
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center space-x-3 ${
-                    currentStep >= step.id ? 'text-primary' : 'text-text-secondary'
-                  }`}>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      currentStep >= step.id 
-                        ? 'bg-primary text-white' :'bg-background border-2 border-border'
-                    }`}>
+                  <div
+                    className={`flex items-center space-x-3 ${
+                      currentStep >= step.id
+                        ? 'text-primary'
+                        : 'text-text-secondary'
+                    }`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        currentStep >= step.id
+                          ? 'bg-primary text-white'
+                          : 'bg-background border-2 border-border'
+                      }`}
+                    >
                       {currentStep > step.id ? (
                         <Icon name="Check" size={20} />
                       ) : (
@@ -252,11 +256,13 @@ const ImportData = () => {
                       <div className="font-medium text-sm">{step.title}</div>
                     </div>
                   </div>
-                  
+
                   {index < steps.length - 1 && (
-                    <div className={`w-8 sm:w-16 h-0.5 mx-4 ${
-                      currentStep > step.id ? 'bg-primary' : 'bg-border'
-                    }`} />
+                    <div
+                      className={`w-8 sm:w-16 h-0.5 mx-4 ${
+                        currentStep > step.id ? 'bg-primary' : 'bg-border'
+                      }`}
+                    />
                   )}
                 </div>
               ))}

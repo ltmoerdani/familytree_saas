@@ -18,44 +18,48 @@ const Dashboard = () => {
   const familyTrees = [
     {
       id: 1,
-      name: "Smith Family Heritage",
+      name: 'Smith Family Heritage',
       memberCount: 47,
       lastModified: new Date(Date.now() - 86400000 * 2),
-      thumbnail: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=300&fit=crop",
+      thumbnail:
+        'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=300&fit=crop',
       isRecent: true,
       collaborators: 3,
-      privacy: "private"
+      privacy: 'private',
     },
     {
       id: 2,
-      name: "Johnson Ancestry Tree",
+      name: 'Johnson Ancestry Tree',
       memberCount: 23,
       lastModified: new Date(Date.now() - 86400000 * 5),
-      thumbnail: "https://images.pexels.com/photos/1128318/pexels-photo-1128318.jpeg?w=400&h=300&fit=crop",
+      thumbnail:
+        'https://images.pexels.com/photos/1128318/pexels-photo-1128318.jpeg?w=400&h=300&fit=crop',
       isRecent: false,
       collaborators: 1,
-      privacy: "shared"
+      privacy: 'shared',
     },
     {
       id: 3,
-      name: "Williams Family Line",
+      name: 'Williams Family Line',
       memberCount: 31,
       lastModified: new Date(Date.now() - 86400000 * 10),
-      thumbnail: "https://images.pixabay.com/photo/2017/05/25/21/33/tree-2343163_1280.jpg?w=400&h=300&fit=crop",
+      thumbnail:
+        'https://images.pixabay.com/photo/2017/05/25/21/33/tree-2343163_1280.jpg?w=400&h=300&fit=crop',
       isRecent: false,
       collaborators: 2,
-      privacy: "private"
+      privacy: 'private',
     },
     {
       id: 4,
-      name: "Brown Heritage Project",
+      name: 'Brown Heritage Project',
       memberCount: 15,
       lastModified: new Date(Date.now() - 86400000 * 15),
-      thumbnail: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=300&fit=crop",
+      thumbnail:
+        'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=300&fit=crop',
       isRecent: false,
       collaborators: 0,
-      privacy: "private"
-    }
+      privacy: 'private',
+    },
   ];
 
   // Mock user stats
@@ -63,35 +67,35 @@ const Dashboard = () => {
     totalMembers: 116,
     totalTrees: 4,
     collaborations: 6,
-    recentUploads: 12
+    recentUploads: 12,
   };
 
   // Mock recent activity
   const recentActivities = [
     {
       id: 1,
-      type: "member_added",
-      message: "Added new family member: Sarah Johnson",
-      treeName: "Johnson Ancestry Tree",
+      type: 'member_added',
+      message: 'Added new family member: Sarah Johnson',
+      treeName: 'Johnson Ancestry Tree',
       timestamp: new Date(Date.now() - 3600000),
-      user: "You"
+      user: 'You',
     },
     {
       id: 2,
-      type: "collaboration",
-      message: "Mike Smith shared \'Smith Family Heritage\' with you",
-      treeName: "Smith Family Heritage",
+      type: 'collaboration',
+      message: "Mike Smith shared 'Smith Family Heritage' with you",
+      treeName: 'Smith Family Heritage',
       timestamp: new Date(Date.now() - 7200000),
-      user: "Mike Smith"
+      user: 'Mike Smith',
     },
     {
       id: 3,
-      type: "export",
-      message: "Exported family tree to PDF",
-      treeName: "Williams Family Line",
+      type: 'export',
+      message: 'Exported family tree to PDF',
+      treeName: 'Williams Family Line',
       timestamp: new Date(Date.now() - 86400000),
-      user: "You"
-    }
+      user: 'You',
+    },
   ];
 
   useEffect(() => {
@@ -107,13 +111,14 @@ const Dashboard = () => {
     tree.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const mostRecentTree = familyTrees.find(tree => tree.isRecent) || familyTrees[0];
+  const mostRecentTree =
+    familyTrees.find(tree => tree.isRecent) || familyTrees[0];
 
-  const formatLastModified = (date) => {
+  const formatLastModified = date => {
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
@@ -131,8 +136,11 @@ const Dashboard = () => {
               <div className="h-8 bg-surface rounded w-1/3 mb-8"></div>
               <div className="h-64 bg-surface rounded-lg mb-8"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-48 bg-surface rounded-lg"></div>
+                {[1, 2, 3].map(item => (
+                  <div
+                    key={`skeleton-${item}`}
+                    className="h-48 bg-surface rounded-lg"
+                  ></div>
                 ))}
               </div>
             </div>
@@ -145,7 +153,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Section */}
@@ -154,7 +162,8 @@ const Dashboard = () => {
               Welcome back to your family trees
             </h1>
             <p className="text-text-secondary">
-              Continue building your family heritage and discover new connections
+              Continue building your family heritage and discover new
+              connections
             </p>
           </div>
 
@@ -184,12 +193,17 @@ const Dashboard = () => {
                       </div>
                       <div className="flex items-center space-x-1">
                         <Icon name="Clock" size={16} />
-                        <span>Last edited {formatLastModified(mostRecentTree.lastModified)}</span>
+                        <span>
+                          Last edited{' '}
+                          {formatLastModified(mostRecentTree.lastModified)}
+                        </span>
                       </div>
                       {mostRecentTree.collaborators > 0 && (
                         <div className="flex items-center space-x-1">
                           <Icon name="UserPlus" size={16} />
-                          <span>{mostRecentTree.collaborators} collaborators</span>
+                          <span>
+                            {mostRecentTree.collaborators} collaborators
+                          </span>
                         </div>
                       )}
                     </div>
@@ -246,12 +260,16 @@ const Dashboard = () => {
                   <div className="flex items-center space-x-4">
                     {/* Search */}
                     <div className="relative">
-                      <Icon name="Search" size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary" />
+                      <Icon
+                        name="Search"
+                        size={20}
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
+                      />
                       <input
                         type="text"
                         placeholder="Search trees..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={e => setSearchQuery(e.target.value)}
                         className="pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
@@ -269,7 +287,7 @@ const Dashboard = () => {
                 {/* Trees Grid */}
                 {filteredTrees.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredTrees.map((tree) => (
+                    {filteredTrees.map(tree => (
                       <TreeCard
                         key={tree.id}
                         tree={tree}
@@ -282,10 +300,18 @@ const Dashboard = () => {
                 ) : (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon name="Search" size={24} className="text-text-secondary" />
+                      <Icon
+                        name="Search"
+                        size={24}
+                        className="text-text-secondary"
+                      />
                     </div>
-                    <h3 className="text-lg font-medium text-text-primary mb-2">No trees found</h3>
-                    <p className="text-text-secondary">Try adjusting your search terms</p>
+                    <h3 className="text-lg font-medium text-text-primary mb-2">
+                      No trees found
+                    </h3>
+                    <p className="text-text-secondary">
+                      Try adjusting your search terms
+                    </p>
                   </div>
                 )}
               </div>
@@ -304,11 +330,15 @@ const Dashboard = () => {
                       <Icon name="Upload" size={20} className="text-primary" />
                     </div>
                     <div>
-                      <div className="font-medium text-text-primary">Import Data</div>
-                      <div className="text-sm text-text-secondary">Upload CSV or Excel</div>
+                      <div className="font-medium text-text-primary">
+                        Import Data
+                      </div>
+                      <div className="text-sm text-text-secondary">
+                        Upload CSV or Excel
+                      </div>
                     </div>
                   </Link>
-                  
+
                   <Link
                     to="/export-share"
                     className="flex items-center space-x-3 p-4 bg-background rounded-lg border border-border hover:border-accent hover:bg-accent-50 transition-smooth"
@@ -317,21 +347,33 @@ const Dashboard = () => {
                       <Icon name="Share2" size={20} className="text-accent" />
                     </div>
                     <div>
-                      <div className="font-medium text-text-primary">Export & Share</div>
-                      <div className="text-sm text-text-secondary">Download or share trees</div>
+                      <div className="font-medium text-text-primary">
+                        Export & Share
+                      </div>
+                      <div className="text-sm text-text-secondary">
+                        Download or share trees
+                      </div>
                     </div>
                   </Link>
-                  
+
                   <Link
                     to="/member-profile"
                     className="flex items-center space-x-3 p-4 bg-background rounded-lg border border-border hover:border-secondary hover:bg-secondary-50 transition-smooth"
                   >
                     <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
-                      <Icon name="User" size={20} className="text-secondary-700" />
+                      <Icon
+                        name="User"
+                        size={20}
+                        className="text-secondary-700"
+                      />
                     </div>
                     <div>
-                      <div className="font-medium text-text-primary">My Profile</div>
-                      <div className="text-sm text-text-secondary">Manage account</div>
+                      <div className="font-medium text-text-primary">
+                        My Profile
+                      </div>
+                      <div className="text-sm text-text-secondary">
+                        Manage account
+                      </div>
                     </div>
                   </Link>
                 </div>
@@ -353,7 +395,8 @@ const Dashboard = () => {
                     Upgrade to Premium
                   </h3>
                   <p className="text-text-secondary text-sm mb-4">
-                    Unlock unlimited trees, advanced collaboration, and premium export options
+                    Unlock unlimited trees, advanced collaboration, and premium
+                    export options
                   </p>
                   <button className="w-full bg-accent text-white px-4 py-2 rounded-lg font-medium hover:bg-accent-600 transition-smooth">
                     Learn More
@@ -368,17 +411,42 @@ const Dashboard = () => {
                 </h3>
                 <div className="space-y-3">
                   {[
-                    { name: "family_photo_1950.jpg", size: "2.4 MB", time: "2 hours ago" },
-                    { name: "birth_certificate.pdf", size: "1.1 MB", time: "1 day ago" },
-                    { name: "wedding_photo.jpg", size: "3.2 MB", time: "3 days ago" }
+                    {
+                      name: 'family_photo_1950.jpg',
+                      size: '2.4 MB',
+                      time: '2 hours ago',
+                    },
+                    {
+                      name: 'birth_certificate.pdf',
+                      size: '1.1 MB',
+                      time: '1 day ago',
+                    },
+                    {
+                      name: 'wedding_photo.jpg',
+                      size: '3.2 MB',
+                      time: '3 days ago',
+                    },
                   ].map((file, index) => (
-                    <div key={index} className="flex items-center space-x-3">
+                    <div
+                      key={file.name}
+                      className="flex items-center space-x-3"
+                    >
                       <div className="w-8 h-8 bg-surface rounded flex items-center justify-center">
-                        <Icon name={file.name.includes('.pdf') ? 'FileText' : 'Image'} size={16} className="text-text-secondary" />
+                        <Icon
+                          name={
+                            file.name.includes('.pdf') ? 'FileText' : 'Image'
+                          }
+                          size={16}
+                          className="text-text-secondary"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-text-primary truncate">{file.name}</div>
-                        <div className="text-xs text-text-secondary">{file.size} • {file.time}</div>
+                        <div className="text-sm font-medium text-text-primary truncate">
+                          {file.name}
+                        </div>
+                        <div className="text-xs text-text-secondary">
+                          {file.size} • {file.time}
+                        </div>
                       </div>
                     </div>
                   ))}

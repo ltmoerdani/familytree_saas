@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Header from 'components/ui/Header';
 import TreeContextIndicator from 'components/ui/TreeContextIndicator';
 import Icon from 'components/AppIcon';
-import Image from 'components/AppImage';
 import ExportFormatCard from './components/ExportFormatCard';
 import ShareSettingsPanel from './components/ShareSettingsPanel';
 import ExportPreview from './components/ExportPreview';
@@ -18,13 +16,13 @@ const ExportShare = () => {
     generations: 'all',
     watermark: false,
     colorScheme: 'default',
-    orientation: 'landscape'
+    orientation: 'landscape',
   });
   const [shareSettings, setShareSettings] = useState({
     privacy: 'private',
     allowEditing: false,
     allowDownload: true,
-    expirationDate: null
+    expirationDate: null,
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -32,10 +30,10 @@ const ExportShare = () => {
   // Mock active tree data
   const activeTree = {
     id: 1,
-    name: "Johnson Family Tree",
+    name: 'Johnson Family Tree',
     memberCount: 47,
     generations: 4,
-    lastModified: new Date(Date.now() - 86400000)
+    lastModified: new Date(Date.now() - 86400000),
   };
 
   // Mock export formats
@@ -47,7 +45,7 @@ const ExportShare = () => {
       icon: 'Image',
       fileSize: '2.4 MB',
       recommended: true,
-      features: ['Transparent background', 'High resolution', 'Web compatible']
+      features: ['Transparent background', 'High resolution', 'Web compatible'],
     },
     {
       id: 'jpg',
@@ -56,7 +54,7 @@ const ExportShare = () => {
       icon: 'Camera',
       fileSize: '1.8 MB',
       recommended: false,
-      features: ['Smaller file size', 'Universal support', 'Print ready']
+      features: ['Smaller file size', 'Universal support', 'Print ready'],
     },
     {
       id: 'pdf',
@@ -65,8 +63,8 @@ const ExportShare = () => {
       icon: 'FileText',
       fileSize: '3.1 MB',
       recommended: false,
-      features: ['Searchable text', 'Print optimized', 'Professional format']
-    }
+      features: ['Searchable text', 'Print optimized', 'Professional format'],
+    },
   ];
 
   // Mock share options
@@ -76,14 +74,14 @@ const ExportShare = () => {
       name: 'Email Invitation',
       description: 'Send direct invitations to family members',
       icon: 'Mail',
-      action: 'invite'
+      action: 'invite',
     },
     {
       id: 'link',
       name: 'Share Link',
       description: 'Generate a shareable link with privacy controls',
       icon: 'Link',
-      action: 'generate'
+      action: 'generate',
     },
     {
       id: 'embed',
@@ -91,15 +89,15 @@ const ExportShare = () => {
       description: 'Add to your website or blog',
       icon: 'Code',
       action: 'embed',
-      premium: true
+      premium: true,
     },
     {
       id: 'social',
       name: 'Social Media',
       description: 'Share on Facebook, Twitter, or LinkedIn',
       icon: 'Share2',
-      action: 'social'
-    }
+      action: 'social',
+    },
   ];
 
   const handleExport = async () => {
@@ -110,26 +108,53 @@ const ExportShare = () => {
       // Simulate download
       const link = document.createElement('a');
       link.href = '#';
-      link.download = `${activeTree.name.replace(/\s+/g, '_')}.${selectedFormat}`;
+      link.download = `${activeTree.name.replace(
+        /\s+/g,
+        '_'
+      )}.${selectedFormat}`;
       link.click();
     }, 3000);
   };
 
-  const handleShare = (option) => {
+  const handleShare = option => {
     console.log('Sharing via:', option.id);
     // Handle different share actions
   };
 
   const tabs = [
     { id: 'export', label: 'Export Options', icon: 'Download' },
-    { id: 'share', label: 'Share Settings', icon: 'Share2' }
+    { id: 'share', label: 'Share Settings', icon: 'Share2' },
   ];
+
+  // Utility function to get radio button label text
+  const getOrientationLabelText = value => {
+    return value === 'landscape' ? 'Landscape' : 'Portrait';
+  };
+
+  // Utility function to get premium badge text
+  const getPremiumBadgeText = isPremium => {
+    return isPremium ? 'Premium' : '';
+  };
+
+  // Utility function to get share button text
+  const getShareButtonText = action => {
+    switch (action) {
+      case 'invite':
+        return 'Invite';
+      case 'generate':
+        return 'Generate';
+      case 'embed':
+        return 'Get Code';
+      default:
+        return 'Share';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <TreeContextIndicator activeTree={activeTree} />
-      
+
       <main className="pt-28 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
@@ -140,10 +165,11 @@ const ExportShare = () => {
                   Export & Share
                 </h1>
                 <p className="text-text-secondary">
-                  Save your family tree in various formats or share with family members
+                  Save your family tree in various formats or share with family
+                  members
                 </p>
               </div>
-              
+
               <div className="hidden md:flex items-center space-x-4">
                 <div className="text-right">
                   <div className="text-sm font-medium text-text-primary">
@@ -162,13 +188,14 @@ const ExportShare = () => {
             {/* Tab Navigation */}
             <div className="border-b border-border">
               <nav className="flex space-x-8">
-                {tabs.map((tab) => (
+                {tabs.map(tab => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-smooth ${
                       activeTab === tab.id
-                        ? 'border-primary text-primary' :'border-transparent text-text-secondary hover:text-primary hover:border-border'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-text-secondary hover:text-primary hover:border-border'
                     }`}
                   >
                     <Icon name={tab.icon} size={16} />
@@ -190,7 +217,7 @@ const ExportShare = () => {
                     Choose Format
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {exportFormats.map((format) => (
+                    {exportFormats.map(format => (
                       <ExportFormatCard
                         key={format.id}
                         format={format}
@@ -212,9 +239,9 @@ const ExportShare = () => {
                       className="flex items-center space-x-2 text-sm text-primary hover:text-primary-600 transition-smooth"
                     >
                       <span>{showAdvanced ? 'Hide' : 'Show'} Advanced</span>
-                      <Icon 
-                        name={showAdvanced ? 'ChevronUp' : 'ChevronDown'} 
-                        size={16} 
+                      <Icon
+                        name={showAdvanced ? 'ChevronUp' : 'ChevronDown'}
+                        size={16}
                       />
                     </button>
                   </div>
@@ -222,15 +249,21 @@ const ExportShare = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Quality */}
                     <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
+                      <label
+                        htmlFor="quality-select"
+                        className="block text-sm font-medium text-text-primary mb-2"
+                      >
                         Quality
                       </label>
                       <select
+                        id="quality-select"
                         value={exportSettings.quality}
-                        onChange={(e) => setExportSettings({
-                          ...exportSettings,
-                          quality: e.target.value
-                        })}
+                        onChange={e =>
+                          setExportSettings({
+                            ...exportSettings,
+                            quality: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 border border-border rounded-md bg-background text-text-primary focus:ring-2 focus:ring-primary focus:border-transparent transition-smooth"
                       >
                         <option value="low">Low (72 DPI)</option>
@@ -242,15 +275,21 @@ const ExportShare = () => {
 
                     {/* Size */}
                     <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
+                      <label
+                        htmlFor="size-select"
+                        className="block text-sm font-medium text-text-primary mb-2"
+                      >
                         Size
                       </label>
                       <select
+                        id="size-select"
                         value={exportSettings.size}
-                        onChange={(e) => setExportSettings({
-                          ...exportSettings,
-                          size: e.target.value
-                        })}
+                        onChange={e =>
+                          setExportSettings({
+                            ...exportSettings,
+                            size: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 border border-border rounded-md bg-background text-text-primary focus:ring-2 focus:ring-primary focus:border-transparent transition-smooth"
                       >
                         <option value="small">Small (1024x768)</option>
@@ -262,15 +301,21 @@ const ExportShare = () => {
 
                     {/* Generations */}
                     <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
+                      <label
+                        htmlFor="generations-select"
+                        className="block text-sm font-medium text-text-primary mb-2"
+                      >
                         Include Generations
                       </label>
                       <select
+                        id="generations-select"
                         value={exportSettings.generations}
-                        onChange={(e) => setExportSettings({
-                          ...exportSettings,
-                          generations: e.target.value
-                        })}
+                        onChange={e =>
+                          setExportSettings({
+                            ...exportSettings,
+                            generations: e.target.value,
+                          })
+                        }
                         className="w-full px-3 py-2 border border-border rounded-md bg-background text-text-primary focus:ring-2 focus:ring-primary focus:border-transparent transition-smooth"
                       >
                         <option value="all">All Generations</option>
@@ -282,37 +327,59 @@ const ExportShare = () => {
 
                     {/* Orientation */}
                     <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
-                        Orientation
-                      </label>
-                      <div className="flex space-x-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            value="landscape"
-                            checked={exportSettings.orientation === 'landscape'}
-                            onChange={(e) => setExportSettings({
-                              ...exportSettings,
-                              orientation: e.target.value
-                            })}
-                            className="mr-2 text-primary focus:ring-primary"
-                          />
-                          <span className="text-sm text-text-primary">Landscape</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            value="portrait"
-                            checked={exportSettings.orientation === 'portrait'}
-                            onChange={(e) => setExportSettings({
-                              ...exportSettings,
-                              orientation: e.target.value
-                            })}
-                            className="mr-2 text-primary focus:ring-primary"
-                          />
-                          <span className="text-sm text-text-primary">Portrait</span>
-                        </label>
-                      </div>
+                      <fieldset>
+                        <legend className="block text-sm font-medium text-text-primary mb-2">
+                          Orientation
+                        </legend>
+                        <div className="flex space-x-4">
+                          <label
+                            htmlFor="orientation-landscape"
+                            className="flex items-center"
+                          >
+                            <input
+                              id="orientation-landscape"
+                              type="radio"
+                              value="landscape"
+                              checked={
+                                exportSettings.orientation === 'landscape'
+                              }
+                              onChange={e =>
+                                setExportSettings({
+                                  ...exportSettings,
+                                  orientation: e.target.value,
+                                })
+                              }
+                              className="mr-2 text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm text-text-primary">
+                              {getOrientationLabelText('landscape')}
+                            </span>
+                          </label>
+                          <label
+                            htmlFor="orientation-portrait"
+                            className="flex items-center"
+                          >
+                            <input
+                              id="orientation-portrait"
+                              type="radio"
+                              value="portrait"
+                              checked={
+                                exportSettings.orientation === 'portrait'
+                              }
+                              onChange={e =>
+                                setExportSettings({
+                                  ...exportSettings,
+                                  orientation: e.target.value,
+                                })
+                              }
+                              className="mr-2 text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm text-text-primary">
+                              {getOrientationLabelText('portrait')}
+                            </span>
+                          </label>
+                        </div>
+                      </fieldset>
                     </div>
                   </div>
 
@@ -322,14 +389,20 @@ const ExportShare = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Watermark */}
                         <div>
-                          <label className="flex items-center">
+                          <label
+                            htmlFor="watermark-checkbox"
+                            className="flex items-center"
+                          >
                             <input
+                              id="watermark-checkbox"
                               type="checkbox"
                               checked={exportSettings.watermark}
-                              onChange={(e) => setExportSettings({
-                                ...exportSettings,
-                                watermark: e.target.checked
-                              })}
+                              onChange={e =>
+                                setExportSettings({
+                                  ...exportSettings,
+                                  watermark: e.target.checked,
+                                })
+                              }
                               className="mr-3 text-primary focus:ring-primary"
                             />
                             <span className="text-sm font-medium text-text-primary">
@@ -343,15 +416,21 @@ const ExportShare = () => {
 
                         {/* Color Scheme */}
                         <div>
-                          <label className="block text-sm font-medium text-text-primary mb-2">
+                          <label
+                            htmlFor="color-scheme-select"
+                            className="block text-sm font-medium text-text-primary mb-2"
+                          >
                             Color Scheme
                           </label>
                           <select
+                            id="color-scheme-select"
                             value={exportSettings.colorScheme}
-                            onChange={(e) => setExportSettings({
-                              ...exportSettings,
-                              colorScheme: e.target.value
-                            })}
+                            onChange={e =>
+                              setExportSettings({
+                                ...exportSettings,
+                                colorScheme: e.target.value,
+                              })
+                            }
                             className="w-full px-3 py-2 border border-border rounded-md bg-background text-text-primary focus:ring-2 focus:ring-primary focus:border-transparent transition-smooth"
                           >
                             <option value="default">Default Colors</option>
@@ -368,14 +447,19 @@ const ExportShare = () => {
                 {/* Export Button */}
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-text-secondary">
-                    Estimated file size: {exportFormats.find(f => f.id === selectedFormat)?.fileSize}
+                    Estimated file size:{' '}
+                    {exportFormats.find(f => f.id === selectedFormat)?.fileSize}
                   </div>
                   <button
                     onClick={handleExport}
                     disabled={isProcessing}
                     className="flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-600 disabled:bg-primary-300 transition-smooth"
                   >
-                    <Icon name={isProcessing ? 'Loader2' : 'Download'} size={20} className={isProcessing ? 'animate-spin' : ''} />
+                    <Icon
+                      name={isProcessing ? 'Loader2' : 'Download'}
+                      size={20}
+                      className={isProcessing ? 'animate-spin' : ''}
+                    />
                     <span>{isProcessing ? 'Exporting...' : 'Export Tree'}</span>
                   </button>
                 </div>
@@ -402,14 +486,18 @@ const ExportShare = () => {
                     Share Options
                   </h2>
                   <div className="space-y-4">
-                    {shareOptions.map((option) => (
+                    {shareOptions.map(option => (
                       <div
                         key={option.id}
                         className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-background transition-smooth"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                            <Icon name={option.icon} size={20} className="text-primary" />
+                            <Icon
+                              name={option.icon}
+                              size={20}
+                              className="text-primary"
+                            />
                           </div>
                           <div>
                             <div className="flex items-center space-x-2">
@@ -418,7 +506,7 @@ const ExportShare = () => {
                               </h3>
                               {option.premium && (
                                 <span className="px-2 py-1 bg-accent text-white text-xs rounded-full">
-                                  Premium
+                                  {getPremiumBadgeText(option.premium)}
                                 </span>
                               )}
                             </div>
@@ -431,9 +519,7 @@ const ExportShare = () => {
                           onClick={() => handleShare(option)}
                           className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-600 transition-smooth"
                         >
-                          {option.action === 'invite' ? 'Invite' : 
-                           option.action === 'generate' ? 'Generate' :
-                           option.action === 'embed' ? 'Get Code' : 'Share'}
+                          {getShareButtonText(option.action)}
                         </button>
                       </div>
                     ))}

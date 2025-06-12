@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from 'components/ui/Header';
 import TreeContextIndicator from 'components/ui/TreeContextIndicator';
@@ -31,7 +31,8 @@ After graduating from Columbia University with a degree in Computer Science, Joh
 Throughout his career, John has been instrumental in developing several successful applications and has mentored numerous junior developers. He is known for his collaborative spirit and his ability to translate complex technical concepts into understandable terms for non-technical stakeholders.
 
 Outside of work, John is an avid photographer and enjoys hiking with his family. He volunteers at local coding bootcamps, helping others transition into technology careers. His commitment to both professional excellence and community service reflects the values instilled in him by his family.`,
-    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+    profilePhoto:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
     relationships: [
       {
         id: 'rel-001',
@@ -39,36 +40,36 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         memberId: 'member-002',
         memberName: 'Sarah Johnson Smith',
         marriageDate: '2010-06-20',
-        marriagePlace: 'Central Park, NY'
+        marriagePlace: 'Central Park, NY',
       },
       {
         id: 'rel-002',
         type: 'child',
         memberId: 'member-003',
         memberName: 'Emma Smith',
-        birthDate: '2012-09-10'
+        birthDate: '2012-09-10',
       },
       {
         id: 'rel-003',
         type: 'child',
         memberId: 'member-004',
         memberName: 'Lucas Smith',
-        birthDate: '2015-04-22'
+        birthDate: '2015-04-22',
       },
       {
         id: 'rel-004',
         type: 'parent',
         memberId: 'member-005',
         memberName: 'Robert Smith',
-        relationship: 'Father'
+        relationship: 'Father',
       },
       {
         id: 'rel-005',
         type: 'parent',
         memberId: 'member-006',
         memberName: 'Margaret Smith',
-        relationship: 'Mother'
-      }
+        relationship: 'Mother',
+      },
     ],
     media: [
       {
@@ -77,7 +78,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Wedding Day',
         url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop',
         date: '2010-06-20',
-        description: 'John and Sarah on their wedding day in Central Park'
+        description: 'John and Sarah on their wedding day in Central Park',
       },
       {
         id: 'media-002',
@@ -85,7 +86,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Family Vacation',
         url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&h=400&fit=crop',
         date: '2018-07-15',
-        description: 'Family vacation to the mountains'
+        description: 'Family vacation to the mountains',
       },
       {
         id: 'media-003',
@@ -93,8 +94,8 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Birth Certificate',
         url: '/assets/documents/birth-certificate.pdf',
         date: '1985-03-15',
-        description: 'Official birth certificate'
-      }
+        description: 'Official birth certificate',
+      },
     ],
     timeline: [
       {
@@ -103,7 +104,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Birth',
         description: 'Born in New York, NY',
         type: 'birth',
-        source: 'Birth Certificate'
+        source: 'Birth Certificate',
       },
       {
         id: 'event-002',
@@ -111,7 +112,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Started College',
         description: 'Enrolled at Columbia University for Computer Science',
         type: 'education',
-        source: 'University Records'
+        source: 'University Records',
       },
       {
         id: 'event-003',
@@ -119,7 +120,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Graduated College',
         description: 'Graduated with Bachelor of Science in Computer Science',
         type: 'education',
-        source: 'Diploma'
+        source: 'Diploma',
       },
       {
         id: 'event-004',
@@ -127,7 +128,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'First Job',
         description: 'Started as Junior Developer at TechStart Inc.',
         type: 'career',
-        source: 'Employment Records'
+        source: 'Employment Records',
       },
       {
         id: 'event-005',
@@ -135,7 +136,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Marriage',
         description: 'Married Sarah Johnson in Central Park, NY',
         type: 'marriage',
-        source: 'Marriage Certificate'
+        source: 'Marriage Certificate',
       },
       {
         id: 'event-006',
@@ -143,7 +144,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'First Child Born',
         description: 'Emma Smith was born',
         type: 'family',
-        source: 'Birth Certificate'
+        source: 'Birth Certificate',
       },
       {
         id: 'event-007',
@@ -151,22 +152,22 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
         title: 'Second Child Born',
         description: 'Lucas Smith was born',
         type: 'family',
-        source: 'Birth Certificate'
-      }
-    ]
+        source: 'Birth Certificate',
+      },
+    ],
   });
 
   const activeTree = {
     id: 'tree-001',
     name: 'Smith Family Tree',
-    description: 'The complete Smith family lineage'
+    description: 'The complete Smith family lineage',
   };
 
   const tabs = [
     { id: 'basic', label: 'Basic Info', icon: 'User' },
     { id: 'relationships', label: 'Relationships', icon: 'Users' },
     { id: 'media', label: 'Media', icon: 'Image' },
-    { id: 'timeline', label: 'Timeline', icon: 'Calendar' }
+    { id: 'timeline', label: 'Timeline', icon: 'Calendar' },
   ];
 
   const handleSave = async () => {
@@ -177,7 +178,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
     setIsSaving(false);
   };
 
-  const handleDataChange = (newData) => {
+  const handleDataChange = newData => {
     setMemberData(prev => ({ ...prev, ...newData }));
     setHasUnsavedChanges(true);
   };
@@ -185,15 +186,32 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
   const renderTabContent = () => {
     switch (activeTab) {
       case 'basic':
-        return <BasicInfoTab memberData={memberData} onDataChange={handleDataChange} />;
+        return (
+          <BasicInfoTab
+            memberData={memberData}
+            onDataChange={handleDataChange}
+          />
+        );
       case 'relationships':
-        return <RelationshipsTab memberData={memberData} onDataChange={handleDataChange} />;
+        return (
+          <RelationshipsTab
+            memberData={memberData}
+            onDataChange={handleDataChange}
+          />
+        );
       case 'media':
-        return <MediaTab memberData={memberData} onDataChange={handleDataChange} />;
+        return (
+          <MediaTab memberData={memberData} onDataChange={handleDataChange} />
+        );
       case 'timeline':
-        return <TimelineTab memberData={memberData} onDataChange={handleDataChange} />;
+        return (
+          <TimelineTab
+            memberData={memberData}
+            onDataChange={handleDataChange}
+          />
+        );
       default:
-        return <BasicInfoTab memberData={memberData} onDataChange={handleDataChange} />;
+        return null;
     }
   };
 
@@ -201,7 +219,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
     <div className="min-h-screen bg-background">
       <Header />
       <TreeContextIndicator activeTree={activeTree} />
-      
+
       <div className="pt-28 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Member Header */}
@@ -217,15 +235,21 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
                 </div>
                 <div>
                   <h1 className="text-2xl font-heading font-semibold text-text-primary">
-                    {memberData.firstName} {memberData.middleName && `${memberData.middleName} `}{memberData.lastName}
+                    {memberData.firstName}{' '}
+                    {memberData.middleName && `${memberData.middleName} `}
+                    {memberData.lastName}
                   </h1>
                   <p className="text-text-secondary">
-                    {memberData.birthDate && new Date(memberData.birthDate).getFullYear()}
-                    {memberData.deathDate && ` - ${new Date(memberData.deathDate).getFullYear()}`}
+                    {memberData.birthDate &&
+                      new Date(memberData.birthDate).getFullYear()}
+                    {memberData.deathDate &&
+                      ` - ${new Date(memberData.deathDate).getFullYear()}`}
                     {!memberData.deathDate && ' - Present'}
                   </p>
                   {memberData.occupation && (
-                    <p className="text-sm text-text-secondary">{memberData.occupation}</p>
+                    <p className="text-sm text-text-secondary">
+                      {memberData.occupation}
+                    </p>
                   )}
                 </div>
               </div>
@@ -237,15 +261,15 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
                     <span>Unsaved changes</span>
                   </span>
                 )}
-                
+
                 <button
                   onClick={handleSave}
                   disabled={!hasUnsavedChanges || isSaving}
                   className="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 disabled:bg-primary-300 disabled:cursor-not-allowed transition-smooth"
                 >
-                  <Icon 
-                    name={isSaving ? 'Loader2' : 'Save'} 
-                    size={16} 
+                  <Icon
+                    name={isSaving ? 'Loader2' : 'Save'}
+                    size={16}
                     className={isSaving ? 'animate-spin' : ''}
                   />
                   <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
@@ -265,13 +289,14 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
           {/* Navigation Tabs */}
           <div className="bg-background border-b border-border mb-6">
             <div className="flex space-x-0 overflow-x-auto">
-              {tabs.map((tab) => (
+              {tabs.map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-smooth ${
                     activeTab === tab.id
-                      ? 'text-primary border-primary bg-primary-50' :'text-text-secondary border-transparent hover:text-primary hover:border-primary-200'
+                      ? 'text-primary border-primary bg-primary-50'
+                      : 'text-text-secondary border-transparent hover:text-primary hover:border-primary-200'
                   }`}
                 >
                   <Icon name={tab.icon} size={16} />
@@ -282,9 +307,7 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
           </div>
 
           {/* Tab Content */}
-          <div className="bg-background">
-            {renderTabContent()}
-          </div>
+          <div className="bg-background">{renderTabContent()}</div>
         </div>
       </div>
 
@@ -297,14 +320,14 @@ Outside of work, John is an avid photographer and enjoys hiking with his family.
             className="w-14 h-14 bg-primary text-white rounded-full shadow-modal flex items-center justify-center transition-smooth hover:bg-primary-600 disabled:bg-primary-300"
             title={isSaving ? 'Saving...' : 'Save Changes'}
           >
-            <Icon 
-              name={isSaving ? 'Loader2' : 'Save'} 
-              size={20} 
+            <Icon
+              name={isSaving ? 'Loader2' : 'Save'}
+              size={20}
               className={isSaving ? 'animate-spin' : ''}
             />
           </button>
         )}
-        
+
         <button
           className="w-12 h-12 bg-accent text-white rounded-full shadow-card flex items-center justify-center transition-smooth hover:bg-accent-600"
           title="Add Event"

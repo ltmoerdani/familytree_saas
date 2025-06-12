@@ -509,14 +509,13 @@ const FamilyTreeCanvas = () => {
                     >
                       <Icon name="Minus" size={14} />
                     </button>
-                    <div
+                    <output
                       className="flex-1 bg-surface rounded-lg px-3 py-2 text-center text-sm text-text-primary border border-border"
-                      role="status"
                       aria-live="polite"
                       aria-label={`Current grid size: ${gridSize} pixels`}
                     >
                       {gridSize}px
-                    </div>
+                    </output>
                     <button
                       onClick={() => setGridSize(Math.min(100, gridSize + 10))}
                       className="w-8 h-8 bg-surface border border-border rounded-lg flex items-center justify-center text-text-secondary hover:text-primary hover:bg-secondary-100 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
@@ -577,7 +576,6 @@ const FamilyTreeCanvas = () => {
                         : 'border-border hover:border-primary-200 hover:bg-surface'
                     }`}
                     aria-label={`Select ${member.firstName} ${member.lastName}, Generation ${member.generation}, ${member.occupation}`}
-                    aria-selected={selectedMember?.id === member.id}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">

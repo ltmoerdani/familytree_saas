@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Icon from 'components/AppIcon';
 
 const CreateTreeModal = ({ isOpen, onClose }) => {
@@ -46,6 +47,17 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
     },
   ];
 
+  // Extract template color logic into helper function
+  const getTemplateColorClasses = templateColor => {
+    if (templateColor === 'primary') {
+      return 'bg-primary-100 text-primary';
+    }
+    if (templateColor === 'accent') {
+      return 'bg-accent-100 text-accent';
+    }
+    return 'bg-secondary-100 text-secondary-700';
+  };
+
   const handleCreate = async () => {
     if (!treeName.trim()) return;
 
@@ -74,13 +86,12 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-1000"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <div className="bg-background rounded-lg shadow-modal w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-1000">
+      <dialog
+        open
+        className="bg-background rounded-lg shadow-modal w-full max-w-md p-0 border-0"
+        aria-labelledby="modal-title"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2
@@ -103,10 +114,14 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
         <div className="p-6 space-y-6">
           {/* Tree Name Input */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label
+              htmlFor="tree-name-input"
+              className="block text-sm font-medium text-text-primary mb-2"
+            >
               Tree Name *
             </label>
             <input
+              id="tree-name-input"
               type="text"
               value={treeName}
               onChange={e => setTreeName(e.target.value)}
@@ -117,10 +132,10 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Template Selection */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-3">
+          <fieldset>
+            <legend className="block text-sm font-medium text-text-primary mb-3">
               Choose Template
-            </label>
+            </legend>
             <div className="space-y-2">
               {templates.map(template => (
                 <button
@@ -135,13 +150,9 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
                 >
                   <div className="flex items-start space-x-3">
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        template.color === 'primary'
-                          ? 'bg-primary-100 text-primary'
-                          : template.color === 'accent'
-                          ? 'bg-accent-100 text-accent'
-                          : 'bg-secondary-100 text-secondary-700'
-                      }`}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${getTemplateColorClasses(
+                        template.color
+                      )}`}
                     >
                       <Icon name={template.icon} size={20} />
                     </div>
@@ -160,7 +171,7 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
                 </button>
               ))}
             </div>
-          </div>
+          </fieldset>
         </div>
 
         {/* Footer */}
@@ -183,9 +194,15 @@ const CreateTreeModal = ({ isOpen, onClose }) => {
             <span>{isCreating ? 'Creating...' : 'Create Tree'}</span>
           </button>
         </div>
-      </div>
+      </dialog>
     </div>
   );
+};
+
+// PropTypes validation
+CreateTreeModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default CreateTreeModal;
