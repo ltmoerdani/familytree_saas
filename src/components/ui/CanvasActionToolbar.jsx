@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import Icon from '../AppIcon';
 
@@ -9,13 +10,13 @@ const CanvasActionToolbar = ({
   onSave, 
   onUndo, 
   onRedo,
-  canUndo = false,
-  canRedo = false,
-  zoomLevel = 100,
-  hasUnsavedChanges = false,
+  canUndo,
+  canRedo,
+  zoomLevel,
+  hasUnsavedChanges,
   onAutoLayout,
   onHierarchicalLayout,
-  layoutMode = 'manual'
+  layoutMode
 }) => {
   const location = useLocation();
   const [isSaving, setIsSaving] = useState(false);
@@ -240,6 +241,33 @@ const CanvasActionToolbar = ({
       </div>
     </>
   );
+};
+
+// PropTypes validation for strict prop checking
+CanvasActionToolbar.propTypes = {
+  onZoomIn: PropTypes.func.isRequired,
+  onZoomOut: PropTypes.func.isRequired,
+  onZoomReset: PropTypes.func.isRequired,
+  onSave: PropTypes.func,
+  onUndo: PropTypes.func.isRequired,
+  onRedo: PropTypes.func.isRequired,
+  canUndo: PropTypes.bool,
+  canRedo: PropTypes.bool,
+  zoomLevel: PropTypes.number,
+  hasUnsavedChanges: PropTypes.bool,
+  onAutoLayout: PropTypes.func.isRequired,
+  onHierarchicalLayout: PropTypes.func.isRequired,
+  layoutMode: PropTypes.oneOf(['manual', 'auto', 'hierarchical']),
+};
+
+// Default props for optional properties
+CanvasActionToolbar.defaultProps = {
+  onSave: undefined,
+  canUndo: false,
+  canRedo: false,
+  zoomLevel: 100,
+  hasUnsavedChanges: false,
+  layoutMode: 'manual',
 };
 
 export default CanvasActionToolbar;

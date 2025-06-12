@@ -4,15 +4,16 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Stage, Layer, Rect, Group } from 'react-konva';
 import Icon from 'components/AppIcon';
 
 const Minimap = ({ 
-  familyMembers = [], 
+  familyMembers, 
   minimapData, 
   onMinimapClick, 
-  isVisible = true,
-  className = ""
+  isVisible,
+  className
 }) => {
   if (!isVisible || !minimapData) return null;
 
@@ -93,6 +94,39 @@ const Minimap = ({
       </div>
     </div>
   );
+};
+
+// PropTypes validation for strict prop checking
+Minimap.propTypes = {
+  familyMembers: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      x: PropTypes.number,
+      y: PropTypes.number,
+    })
+  ),
+  minimapData: PropTypes.shape({
+    minimapWidth: PropTypes.number.isRequired,
+    minimapHeight: PropTypes.number.isRequired,
+    minimapScale: PropTypes.number.isRequired,
+    viewport: PropTypes.shape({
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+      height: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
+  onMinimapClick: PropTypes.func,
+  isVisible: PropTypes.bool,
+  className: PropTypes.string,
+};
+
+// Default props for optional properties
+Minimap.defaultProps = {
+  familyMembers: [],
+  onMinimapClick: undefined,
+  isVisible: true,
+  className: "",
 };
 
 export default Minimap;

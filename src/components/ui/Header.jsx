@@ -14,7 +14,7 @@ const Header = () => {
     { label: 'Export & Share', path: '/export-share', icon: 'Share2' },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = path => location.pathname === path;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
@@ -24,13 +24,24 @@ const Header = () => {
     setIsProfileOpen(false);
   };
 
+  // Handle escape key to close menus (accessibility)
+  const handleKeyDown = event => {
+    if (event.key === 'Escape') {
+      closeMenus();
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 bg-background border-b border-border z-1000">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/dashboard" className="flex items-center space-x-2" onClick={closeMenus}>
+            <Link
+              to="/dashboard"
+              className="flex items-center space-x-2"
+              onClick={closeMenus}
+            >
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Icon name="TreePine" size={20} color="white" />
               </div>
@@ -42,13 +53,14 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-smooth hover:bg-surface ${
                   isActive(item.path)
-                    ? 'text-primary bg-primary-50' :'text-text-secondary hover:text-primary'
+                    ? 'text-primary bg-primary-50'
+                    : 'text-text-secondary hover:text-primary'
                 }`}
                 onClick={closeMenus}
               >
@@ -104,7 +116,7 @@ const Header = () => {
               onClick={toggleMenu}
               className="p-2 rounded-md text-text-secondary hover:text-primary hover:bg-surface transition-smooth"
             >
-              <Icon name={isMenuOpen ? "X" : "Menu"} size={24} />
+              <Icon name={isMenuOpen ? 'X' : 'Menu'} size={24} />
             </button>
           </div>
         </div>
@@ -114,13 +126,14 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-background border-t border-border z-1020">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium transition-smooth ${
                   isActive(item.path)
-                    ? 'text-primary bg-primary-50' :'text-text-secondary hover:text-primary hover:bg-surface'
+                    ? 'text-primary bg-primary-50'
+                    : 'text-text-secondary hover:text-primary hover:bg-surface'
                 }`}
                 onClick={closeMenus}
               >
@@ -129,7 +142,7 @@ const Header = () => {
               </Link>
             ))}
           </div>
-          
+
           {/* Mobile Profile Section */}
           <div className="border-t border-border px-2 pt-4 pb-3">
             <div className="flex items-center space-x-3 px-3 py-2">
@@ -137,8 +150,12 @@ const Header = () => {
                 <Icon name="User" size={20} color="white" />
               </div>
               <div>
-                <div className="text-base font-medium text-text-primary">User Account</div>
-                <div className="text-sm text-text-secondary">Manage your profile</div>
+                <div className="text-base font-medium text-text-primary">
+                  User Account
+                </div>
+                <div className="text-sm text-text-secondary">
+                  Manage your profile
+                </div>
               </div>
             </div>
             <div className="mt-3 space-y-1">
@@ -165,10 +182,13 @@ const Header = () => {
 
       {/* Overlay for mobile menu */}
       {(isMenuOpen || isProfileOpen) && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-25 z-999"
+        <button
+          type="button"
+          aria-label="Close menu overlay"
+          className="fixed inset-0 bg-black bg-opacity-25 z-999 border-none cursor-pointer"
           onClick={closeMenus}
-        ></div>
+          onKeyDown={handleKeyDown}
+        />
       )}
     </header>
   );

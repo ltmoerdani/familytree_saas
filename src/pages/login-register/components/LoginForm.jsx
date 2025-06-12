@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Icon from 'components/AppIcon';
 
@@ -6,7 +7,7 @@ const LoginForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
+    rememberMe: false,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,21 +15,21 @@ const LoginForm = ({ onSuccess }) => {
   // Mock credentials for demo
   const mockCredentials = {
     email: 'demo@familytree.com',
-    password: 'Demo123!'
+    password: 'Demo123!',
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -51,9 +52,9 @@ const LoginForm = ({ onSuccess }) => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -65,11 +66,15 @@ const LoginForm = ({ onSuccess }) => {
     // Simulate API call
     setTimeout(() => {
       // Check mock credentials
-      if (formData.email === mockCredentials.email && formData.password === mockCredentials.password) {
+      if (
+        formData.email === mockCredentials.email &&
+        formData.password === mockCredentials.password
+      ) {
         onSuccess();
       } else {
         setErrors({
-          general: 'Invalid email or password. Use demo@familytree.com / Demo123!'
+          general:
+            'Invalid email or password. Use demo@familytree.com / Demo123!',
         });
         setIsSubmitting(false);
       }
@@ -81,7 +86,11 @@ const LoginForm = ({ onSuccess }) => {
       {/* General Error */}
       {errors.general && (
         <div className="bg-error-50 border border-error-200 rounded-lg p-3 flex items-start space-x-2">
-          <Icon name="AlertCircle" size={16} className="text-error-500 mt-0.5 flex-shrink-0" />
+          <Icon
+            name="AlertCircle"
+            size={16}
+            className="text-error-500 mt-0.5 flex-shrink-0"
+          />
           <span className="text-sm text-error-700">{errors.general}</span>
         </div>
       )}
@@ -89,7 +98,11 @@ const LoginForm = ({ onSuccess }) => {
       {/* Demo Credentials Info */}
       <div className="bg-accent-50 border border-accent-200 rounded-lg p-3">
         <div className="flex items-start space-x-2">
-          <Icon name="Info" size={16} className="text-accent-600 mt-0.5 flex-shrink-0" />
+          <Icon
+            name="Info"
+            size={16}
+            className="text-accent-600 mt-0.5 flex-shrink-0"
+          />
           <div className="text-sm text-accent-800">
             <p className="font-medium mb-1">Demo Credentials:</p>
             <p>Email: {mockCredentials.email}</p>
@@ -100,7 +113,10 @@ const LoginForm = ({ onSuccess }) => {
 
       {/* Email Field */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-text-primary mb-2"
+        >
           Email Address
         </label>
         <div className="relative">
@@ -111,14 +127,15 @@ const LoginForm = ({ onSuccess }) => {
             value={formData.email}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 pl-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.email 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.email
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="Enter your email"
           />
-          <Icon 
-            name="Mail" 
-            size={18} 
+          <Icon
+            name="Mail"
+            size={18}
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
               errors.email ? 'text-error-400' : 'text-text-secondary'
             }`}
@@ -134,7 +151,10 @@ const LoginForm = ({ onSuccess }) => {
 
       {/* Password Field */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-text-primary mb-2"
+        >
           Password
         </label>
         <div className="relative">
@@ -145,14 +165,15 @@ const LoginForm = ({ onSuccess }) => {
             value={formData.password}
             onChange={handleInputChange}
             className={`w-full px-4 py-3 pl-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-smooth ${
-              errors.password 
-                ? 'border-error-300 bg-error-50' :'border-border bg-background hover:border-primary-300'
+              errors.password
+                ? 'border-error-300 bg-error-50'
+                : 'border-border bg-background hover:border-primary-300'
             }`}
             placeholder="Enter your password"
           />
-          <Icon 
-            name="Lock" 
-            size={18} 
+          <Icon
+            name="Lock"
+            size={18}
             className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
               errors.password ? 'text-error-400' : 'text-text-secondary'
             }`}
@@ -178,7 +199,7 @@ const LoginForm = ({ onSuccess }) => {
           />
           <span className="text-sm text-text-secondary">Remember me</span>
         </label>
-        
+
         <Link
           to="#"
           className="text-sm text-primary hover:text-primary-600 transition-smooth"
@@ -207,6 +228,11 @@ const LoginForm = ({ onSuccess }) => {
       </button>
     </form>
   );
+};
+
+// PropTypes validation for strict prop checking
+LoginForm.propTypes = {
+  onSuccess: PropTypes.func.isRequired,
 };
 
 export default LoginForm;
