@@ -672,35 +672,66 @@ const FamilyTreeCanvas = () => {
           >
             {/* Layer 1: Background Grid (paling bawah) */}
             <Layer>
-              {/* Grid lines - Background layer */}
+              {/* Grid lines - Dynamic rendering based on viewport */}
               {showGrid && (
                 <React.Fragment>
-                  {/* Horizontal grid lines */}
-                  {Array.from(
-                    { length: Math.ceil(2000 / gridSize) + 1 },
-                    (_, i) => (
-                      <Line
-                        key={`h-line-${i}`}
-                        points={[0, i * gridSize, 2000, i * gridSize]}
-                        stroke="#E5E7EB"
-                        strokeWidth={1}
-                        opacity={0.3}
-                      />
-                    )
-                  )}
-                  {/* Vertical grid lines */}
-                  {Array.from(
-                    { length: Math.ceil(2000 / gridSize) + 1 },
-                    (_, i) => (
-                      <Line
-                        key={`v-line-${i}`}
-                        points={[i * gridSize, 0, i * gridSize, 1500]}
-                        stroke="#E5E7EB"
-                        strokeWidth={1}
-                        opacity={0.3}
-                      />
-                    )
-                  )}
+                  {/* Calculate visible area and render only necessary grid lines */}
+                  {(() => {
+                    // Calculate visible area in world coordinates
+                    const visibleLeft = -position.x / scale;
+                    const visibleTop = -position.y / scale;
+                    const visibleRight = visibleLeft + stageSize.width / scale;
+                    const visibleBottom = visibleTop + stageSize.height / scale;
+
+                    // Add padding to ensure grid covers edges during transitions
+                    const padding = 500;
+
+                    // Calculate grid range
+                    const startX =
+                      Math.floor((visibleLeft - padding) / gridSize) * gridSize;
+                    const endX =
+                      Math.ceil((visibleRight + padding) / gridSize) * gridSize;
+                    const startY =
+                      Math.floor((visibleTop - padding) / gridSize) * gridSize;
+                    const endY =
+                      Math.ceil((visibleBottom + padding) / gridSize) *
+                      gridSize;
+
+                    // Grid lines to render
+                    const gridLines = [];
+
+                    // Extended visible area width and height with padding
+                    const extendedWidth = endX - startX;
+                    const extendedHeight = endY - startY;
+
+                    // Horizontal grid lines
+                    for (let y = startY; y <= endY; y += gridSize) {
+                      gridLines.push(
+                        <Line
+                          key={`h-line-${y}`}
+                          points={[startX, y, startX + extendedWidth, y]}
+                          stroke="#D2B48C"
+                          strokeWidth={0.5}
+                          opacity={0.4}
+                        />
+                      );
+                    }
+
+                    // Vertical grid lines
+                    for (let x = startX; x <= endX; x += gridSize) {
+                      gridLines.push(
+                        <Line
+                          key={`v-line-${x}`}
+                          points={[x, startY, x, startY + extendedHeight]}
+                          stroke="#D2B48C"
+                          strokeWidth={0.5}
+                          opacity={0.4}
+                        />
+                      );
+                    }
+
+                    return gridLines;
+                  })()}
                 </React.Fragment>
               )}
             </Layer>
@@ -712,10 +743,10 @@ const FamilyTreeCanvas = () => {
                 <React.Fragment key={gen.level}>
                   <Line
                     points={[0, gen.y - 30, 2000, gen.y - 30]}
-                    stroke="#E5E7EB"
+                    stroke="#D2B48C" // Match grid color
                     strokeWidth={1}
                     dash={[5, 5]}
-                    opacity={0.5}
+                    opacity={0.7} // Increased opacity for better visibility
                   />
                   <Text
                     x={20}
@@ -723,7 +754,7 @@ const FamilyTreeCanvas = () => {
                     text={`Generasi: ${gen.level}`}
                     fontSize={12}
                     fontFamily="Inter"
-                    fill="#6B4E3D"
+                    fill="#6B4E3D" // Deeper brown for text
                   />
                 </React.Fragment>
               ))}
