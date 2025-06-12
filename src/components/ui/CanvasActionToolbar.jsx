@@ -17,6 +17,7 @@ const CanvasActionToolbar = ({
   onAutoLayout,
   onHierarchicalLayout,
   layoutMode,
+  containerRef,
 }) => {
   const location = useLocation();
   const [isSaving, setIsSaving] = useState(false);
@@ -132,8 +133,8 @@ const CanvasActionToolbar = ({
 
   return (
     <>
-      {/* Desktop Toolbar - significantly adjusted vertical position */}
-      <div className="hidden md:flex fixed top-32 left-1/2 transform -translate-x-1/2 bg-background border border-border rounded-lg shadow-card z-1000">
+      {/* Desktop Toolbar - Now positioned inside canvas with absolute positioning */}
+      <div className="hidden md:flex absolute top-4 left-1/2 transform -translate-x-1/2 bg-background border border-border rounded-lg shadow-card z-50">
         <div className="flex items-center px-2 py-2 space-x-1">
           {toolbarItems.map(item => {
             if (item.type === 'divider') {
@@ -265,6 +266,7 @@ CanvasActionToolbar.propTypes = {
   onAutoLayout: PropTypes.func.isRequired,
   onHierarchicalLayout: PropTypes.func.isRequired,
   layoutMode: PropTypes.oneOf(['manual', 'auto', 'hierarchical']),
+  containerRef: PropTypes.object,
 };
 
 // Default props for optional properties
@@ -275,6 +277,7 @@ CanvasActionToolbar.defaultProps = {
   zoomLevel: 100,
   hasUnsavedChanges: false,
   layoutMode: 'manual',
+  containerRef: null,
 };
 
 export default CanvasActionToolbar;

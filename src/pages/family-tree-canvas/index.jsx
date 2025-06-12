@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Stage, Layer, Text, Line } from 'react-konva';
 import Header from 'components/ui/Header';
 import TreeContextIndicator from 'components/ui/TreeContextIndicator';
@@ -340,6 +340,8 @@ const FamilyTreeCanvas = () => {
   // Get minimap data
   const minimapData = showMinimap ? getMinimapData() : null;
 
+  const canvasContainerRef = useRef(null);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -599,6 +601,7 @@ const FamilyTreeCanvas = () => {
 
         {/* Main Canvas Area */}
         <div
+          ref={canvasContainerRef}
           className="flex-1 relative overflow-hidden bg-gray-50"
           style={{
             position: 'relative',
@@ -629,28 +632,23 @@ const FamilyTreeCanvas = () => {
             </button>
           </div>
 
-          {/* Zoom Controls */}
-          <div className="absolute bottom-4 left-4 z-50 bg-background border border-border rounded-lg shadow-card">
-            <div className="flex flex-col">
-              <button
-                onClick={zoomIn}
-                className="p-3 text-text-secondary hover:text-primary hover:bg-surface transition-smooth border-b border-border"
-                title="Zoom In"
-              >
-                <Icon name="Plus" size={16} />
-              </button>
-              <div className="px-3 py-2 text-xs text-center text-text-secondary border-b border-border">
-                {zoomPercentage}%
-              </div>
-              <button
-                onClick={zoomOut}
-                className="p-3 text-text-secondary hover:text-primary hover:bg-surface transition-smooth"
-                title="Zoom Out"
-              >
-                <Icon name="Minus" size={16} />
-              </button>
-            </div>
-          </div>
+          {/* Canvas Action Toolbar - Now positioned inside the canvas container */}
+          <CanvasActionToolbar
+            onZoomIn={zoomIn}
+            onZoomOut={zoomOut}
+            onZoomReset={resetZoom}
+            onSave={handleSave}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            zoomLevel={zoomPercentage}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onAutoLayout={applyAutoLayout}
+            onHierarchicalLayout={applyHierarchicalLayout}
+            layoutMode={layoutMode}
+            containerRef={canvasContainerRef}
+          />
 
           {/* Konva Stage */}
           <Stage
@@ -750,14 +748,14 @@ const FamilyTreeCanvas = () => {
           </Stage>
 
           {/* UI Controls Layer (paling atas) */}
-          {/* Minimap - Z-Index paling tinggi */}
+          {/* Minimap - Repositioned to bottom-left */}
           {showMinimap && (
             <div
-              className="absolute top-4 right-4 z-50"
+              className="absolute bottom-4 left-4 z-50"
               style={{
                 position: 'absolute',
-                top: '1rem',
-                right: '1rem',
+                bottom: '1rem',
+                left: '1rem',
                 zIndex: 1000,
                 pointerEvents: 'auto',
               }}
@@ -978,23 +976,6 @@ const FamilyTreeCanvas = () => {
           </div>
         </div>
       </div>
-
-      {/* Canvas Action Toolbar */}
-      <CanvasActionToolbar
-        onZoomIn={zoomIn}
-        onZoomOut={zoomOut}
-        onZoomReset={resetZoom}
-        onSave={handleSave}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        zoomLevel={zoomPercentage}
-        hasUnsavedChanges={hasUnsavedChanges}
-        onAutoLayout={applyAutoLayout}
-        onHierarchicalLayout={applyHierarchicalLayout}
-        layoutMode={layoutMode}
-      />
 
       {/* Export Modal */}
       {isExportModalOpen && (
